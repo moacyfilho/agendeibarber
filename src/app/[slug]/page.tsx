@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = 'force-dynamic'
-import { MapPin, Clock, Instagram, Scissors, Star, ChevronRight, CheckCircle } from "lucide-react";
+import { MapPin, Clock, Camera, Scissors, Star, ChevronRight, CheckCircle } from "lucide-react";
 import { CustomerEntryFlow } from "@/components/CustomerEntryFlow";
 
 export default async function BarbeariaPublicPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -102,7 +102,7 @@ export default async function BarbeariaPublicPage({ params }: { params: Promise<
           {[
             { icon: MapPin,    title: 'Localização', value: 'Bairro Central, 120 — SP' },
             { icon: Clock,     title: 'Horário',     value: 'Seg–Sáb, 9h às 20h' },
-            { icon: Instagram, title: 'Instagram',   value: `@${tenant.slug}` },
+            { icon: Camera,    title: 'Instagram',   value: `@${tenant.slug}` },
           ].map(({ icon: Icon, title, value }) => (
             <div
               key={title}
