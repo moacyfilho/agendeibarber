@@ -6,9 +6,6 @@ const nextConfig: NextConfig = {
     // Desabilitar aqui enquanto o ambiente local e o de deploy divergem
     ignoreBuildErrors: true,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
 };
 
 export default nextConfig;
