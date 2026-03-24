@@ -1,16 +1,18 @@
 import { auth } from "@/auth"
 import { NextResponse } from "next/server"
 
+// Next.js 16: middleware.ts renamed to proxy.ts
+// See: node_modules/next/dist/docs/01-app/03-api-reference/03-file-conventions/proxy.md
 export default auth((req) => {
   const isLogged = !!req.auth
   const { nextUrl } = req
 
-  // Se estiver tentando acessar /dashboard e não estiver logado -> Login
+  // Proteger /dashboard quando não logado
   if (nextUrl.pathname.startsWith("/dashboard") && !isLogged) {
     return NextResponse.redirect(new URL("/auth/login", nextUrl))
   }
 
-  // Se estiver logado e for pra login -> Dashboard
+  // Redirecionar login para dashboard quando já logado
   if (nextUrl.pathname === "/auth/login" && isLogged) {
     return NextResponse.redirect(new URL("/dashboard", nextUrl))
   }
