@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = 'force-dynamic'
-import { MapPin, Clock, Camera, Scissors, Star, ChevronRight, CheckCircle } from "lucide-react";
+import { MapPin, Clock, Instagram, Scissors, Star, ChevronRight, CheckCircle } from "lucide-react";
 import { CustomerEntryFlow } from "@/components/CustomerEntryFlow";
 
 export default async function BarbeariaPublicPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -148,7 +148,7 @@ export default async function BarbeariaPublicPage({ params }: { params: Promise<
                     </div>
                   </div>
                   <p className="text-orange-400 font-black text-base flex-shrink-0">
-                    {(service.price / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                    {(service.priceInCents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                   </p>
                 </a>
               ))}
