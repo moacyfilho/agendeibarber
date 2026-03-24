@@ -13,7 +13,7 @@ export default async function BarbeariaPublicPage({ params }: { params: Promise<
 
   const [barbers, services] = await Promise.all([
     prisma.user.findMany({ where: { role: 'BARBER', tenantId: tenant.id } }),
-    prisma.service.findMany({ where: { isActive: true, tenantId: tenant.id }, orderBy: { price: 'asc' } }),
+    prisma.service.findMany({ where: { isActive: true, tenantId: tenant.id }, orderBy: { priceInCents: 'asc' } }),
   ]);
 
   const initial = tenant.name.charAt(0).toUpperCase();
