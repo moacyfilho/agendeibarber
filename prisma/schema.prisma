@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  OWNER
+  BARBER
+  CUSTOMER
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  UNPAID
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+}
+
+model Tenant {
+  id            String         @id @default(uuid()) @db.Uuid
+  name          String         @db.VarChar(255)
+  slug          String         @unique @db.VarChar(100)
+  subscriptions Subscription[]
+  users         User[]
+  services      Service[]
+  appointments  Appointment[]
+
+  createdAt     DateTime       @default(now()) @db.Timestamptz()
+  updatedAt     DateTime       @default(now()) @db.Timestamptz()
+}
+
+model Subscription {
+  id                   String             @id @default(uuid()) @db.Uuid
+  tenant               Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId             String             @db.Uuid
+  stripeCustomerId     String?            @unique @db.VarChar(255)
+  stripeSubscriptionId String?            @unique @db.VarChar(255)
+  status               SubscriptionStatus @default(ACTIVE)
+  currentPeriodEnd     DateTime           @db.Timestamptz()
+  
+  // No PostgreSQL puro faríamos GENERATED ALWAYS AS, mas no Prisma lidamos com isso no Backend ou via RAW SQL migration
+  gracePeriodEnd       DateTime           @db.Timestamptz()
+
+  createdAt            DateTime           @default(now()) @db.Timestamptz()
+  updatedAt            DateTime           @default(now()) @db.Timestamptz()
+}
+
+model User {
+  id            String        @id @default(uuid()) @db.Uuid
+  tenant        Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId      String        @db.Uuid
+  role          Role
+  name          String        @db.VarChar(255)
+  email         String        @db.VarChar(255)
+  phone         String?       @db.VarChar(20)
+  passwordHash  String?       @db.VarChar(255)
+  
+  // Relacionamentos dependendo do role:
+  appointmentsAsCustomer Appointment[] @relation("CustomerAppointments")
+  appointmentsAsBarber   Appointment[] @relation("BarberAppointments")
+
+  createdAt     DateTime      @default(now()) @db.Timestamptz()
+
+  @@unique([tenantId, email])
+}
+
+model Service {
+  id              String        @id @default(uuid()) @db.Uuid
+  tenant          Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId        String        @db.Uuid
+  name            String        @db.VarChar(100)
+  description     String?       @db.Text
+  priceInCents    Int           // Boas práticas: valor inteiro
+  durationMinutes Int
+  isActive        Boolean       @default(true)
+  appointments    Appointment[]
+  
+  createdAt       DateTime      @default(now()) @db.Timestamptz()
+}
+
+model Appointment {
+  id            String             @id @default(uuid()) @db.Uuid
+  tenant        Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId      String             @db.Uuid
+  
+  customer      User               @relation("CustomerAppointments", fields: [customerId], references: [id])
+  customerId    String             @db.Uuid
+  
+  barber        User               @relation("BarberAppointments", fields: [barberId], references: [id])
+  barberId      String             @db.Uuid
+
+  service       Service            @relation(fields: [serviceId], references: [id])
+  serviceId     String             @db.Uuid
+
+  scheduledAt   DateTime           @db.Timestamptz()
+  endTime       DateTime           @db.Timestamptz()
+
+  status        AppointmentStatus  @default(PENDING)
+  paymentStatus PaymentStatus      @default(PENDING)
+  totalPrice    Int                // Snaphot do preço em centavos
+
+  createdAt     DateTime           @default(now()) @db.Timestamptz()
+  updatedAt     DateTime           @default(now()) @db.Timestamptz()
+}
