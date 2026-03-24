@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { Settings, Palette, MapPin, Instagram, Phone, Clock, Save } from "lucide-react";
+import { Settings, Palette, MapPin, Camera, Phone, Clock, Save } from "lucide-react";
 import { redirect } from "next/navigation";
 
 async function getTenantForDashboard() {
@@ -73,7 +73,7 @@ export default async function ConfiguracoesPage() {
 
             <div className="space-y-2">
               <label className="text-xs font-black uppercase tracking-widest text-zinc-500 ml-1 flex items-center gap-2">
-                <Instagram className="w-3.5 h-3.5" /> Instagram
+                <Camera className="w-3.5 h-3.5" /> Instagram
               </label>
               <input type="text" name="instagramUrl" defaultValue={tenant.instagramUrl || ""} placeholder="@suabarbearia" className="w-full bg-zinc-900 border border-zinc-800 h-14 rounded-2xl px-5 text-white font-medium focus:outline-none focus:border-orange-500 transition-colors" />
             </div>

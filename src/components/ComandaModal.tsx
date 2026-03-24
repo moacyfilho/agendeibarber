@@ -81,7 +81,7 @@ export function ComandaModal({ appointment, products, trigger }: ComandaModalPro
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
+      <DialogTrigger>
         {trigger}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[700px] bg-[#050505] border border-zinc-900 text-white rounded-[2.5rem] p-0 overflow-hidden shadow-2xl">

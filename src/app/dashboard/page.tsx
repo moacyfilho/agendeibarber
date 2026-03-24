@@ -28,7 +28,7 @@ export default async function DashboardPage() {
   });
 
   const serviceRevenue = completedToday.reduce((acc, curr) => acc + curr.totalPrice, 0);
-  const productRevenue = productSalesToday.reduce((acc, curr) => acc + curr.totalAmount, 0);
+  const productRevenue = productSalesToday.reduce((acc, curr) => acc + curr.totalPrice, 0);
   const totalRevenueToday = (serviceRevenue + productRevenue) / 100;
   
   const revenueFormatted = totalRevenueToday.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });

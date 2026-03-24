@@ -484,6 +484,7 @@ export async function createStripeCheckoutSessionAction() {
 
   // Import dinâmico para evitar problemas no edge se necessário, ou direto
   const { stripe } = await import('@/lib/stripe');
+  if (!stripe) throw new Error("Stripe não configurado. Defina STRIPE_SECRET_KEY no .env");
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
