@@ -3,6 +3,8 @@ import Link from 'next/link';
 import React from 'react';
 import { DashboardNav } from './DashboardNav';
 
+export const dynamic = 'force-dynamic'
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen bg-[#030303] text-zinc-50 font-sans overflow-hidden relative">

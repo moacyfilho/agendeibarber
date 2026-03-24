@@ -1,5 +1,7 @@
 import { Building2, ShieldCheck } from "lucide-react"
 import { prisma } from "@/lib/prisma"
+
+export const dynamic = 'force-dynamic'
 import { NewTenantModal } from "./NewTenantModal"
 import { TenantRow } from "./TenantRow"
 
