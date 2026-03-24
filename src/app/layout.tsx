@@ -15,6 +15,13 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Agendei Barber | Plataforma de Gestão",
   description: "Plataforma completa de Sistema SaaS para Barbearias com agendamento inteligente.",
+  manifest: "/manifest.json",
+  themeColor: "#f97316",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Agendei Barber",
+  },
 };
 
 export default function RootLayout({

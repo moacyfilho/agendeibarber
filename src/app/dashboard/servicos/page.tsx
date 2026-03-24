@@ -5,11 +5,11 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { getServicos } from "@/lib/db"
+import { prisma } from "@/lib/prisma"
 import { createServicoAction } from "@/app/actions"
 
-export default function ServicosPage() {
-  const servicos = getServicos();
+export default async function ServicosPage() {
+  const servicos = await prisma.service.findMany({ orderBy: { createdAt: 'desc' } });
 
   return (
     <div className="p-8 md:p-12 max-w-7xl mx-auto min-h-screen">
@@ -65,10 +65,10 @@ export default function ServicosPage() {
             {servicos.map((s: any) => (
               <TableRow key={s.id} className="border-zinc-900 hover:bg-zinc-900/50">
                 <TableCell className="font-bold text-white py-6 pl-8 text-lg">{s.name}</TableCell>
-                <TableCell className="text-zinc-400 font-medium text-base">⏱️ {s.time}</TableCell>
+                <TableCell className="text-zinc-400 font-medium text-base">⏱️ {s.durationMinutes} min</TableCell>
                 <TableCell>
                   <span className="font-black text-green-400 bg-green-500/10 px-4 py-2 rounded-xl border border-green-500/20 text-lg">
-                    {s.price}
+                    R$ {(s.priceInCents / 100).toFixed(2).replace('.', ',')}
                   </span>
                 </TableCell>
               </TableRow>

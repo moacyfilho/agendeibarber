@@ -1,11 +1,12 @@
-import { Building2, Plus, ArrowRight, ShieldCheck, Power } from "lucide-react"
+import { Building2, ShieldCheck } from "lucide-react"
+import { prisma } from "@/lib/prisma"
+import { NewTenantModal } from "./NewTenantModal"
+import { TenantRow } from "./TenantRow"
 
-export default function SuperAdminDashboard() {
-  const tenants = [
-    { id: 1, name: "Barbearia do João", slug: "barbearia-joao", plan: "Pro", since: "Fev 2024", status: "Ativo" },
-    { id: 2, name: "Navalha de Ouro", slug: "navalha-ouro", plan: "Basic", since: "Mar 2024", status: "Ativo" },
-    { id: 3, name: "Old School Barber", slug: "old-school", plan: "Elite", since: "Jan 2024", status: "Bloqueado" },
-  ];
+export default async function SuperAdminDashboard() {
+  const tenants = await prisma.tenant.findMany({
+    orderBy: { createdAt: 'desc' }
+  });
 
   return (
     <div className="p-10 md:p-14 max-w-7xl mx-auto min-h-screen">
@@ -22,9 +23,7 @@ export default function SuperAdminDashboard() {
           </p>
         </div>
         
-        <button className="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold h-14 px-8 rounded-xl text-lg shadow-[0_0_30px_rgba(16,185,129,0.3)] transition-all active:scale-95 flex items-center gap-2">
-          <Plus className="w-6 h-6" /> Cadastrar Nova Barbearia
-        </button>
+        <NewTenantModal />
       </header>
 
       {/* METRICAS DO SAAS */}
@@ -42,40 +41,17 @@ export default function SuperAdminDashboard() {
         
         <div className="flex flex-col gap-4">
           {tenants.map(t => (
-            <div key={t.id} className="flex flex-col md:flex-row md:justify-between md:items-center p-6 border border-zinc-800 rounded-3xl bg-zinc-950/50 hover:bg-zinc-900 hover:border-emerald-500/30 transition-all group">
-              <div className="flex items-center gap-6">
-                <div className="w-16 h-16 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center font-black text-zinc-500 text-2xl group-hover:text-emerald-500 transition-colors">
-                  {t.name.charAt(0)}
-                </div>
-                <div>
-                  <p className="font-extrabold text-white text-xl mb-1">{t.name}</p>
-                  <p className="text-sm font-medium text-zinc-400 flex items-center gap-2">
-                    app.agendeibarber.com.br/<span className="text-emerald-400">{t.slug}</span>
-                  </p>
-                </div>
-              </div>
-              <div className="mt-5 md:mt-0 flex flex-wrap items-center gap-4">
-                <span className="font-bold text-sm bg-zinc-800 text-zinc-300 px-4 py-2 rounded-xl border border-zinc-700">
-                  Plano: {t.plan}
-                </span>
-                {t.status === "Ativo" ? (
-                  <span className="font-black text-[10px] text-green-400 bg-green-500/10 border border-green-500/20 px-3 py-2 rounded-xl tracking-widest uppercase">
-                    PAGAMENTO OK
-                  </span>
-                ) : (
-                  <span className="font-black text-[10px] text-red-500 bg-red-500/10 border border-red-500/20 px-3 py-2 rounded-xl tracking-widest uppercase">
-                    INADIMPLENTE
-                  </span>
-                )}
-                <button className="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-500 hover:text-white hover:bg-emerald-500 hover:border-emerald-500 transition-all">
-                  <Power className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                </button>
-              </div>
-            </div>
+            <TenantRow key={t.id} t={t} />
           ))}
+          {tenants.length === 0 && (
+            <div className="text-center py-20 text-zinc-600 font-bold italic">
+               Nenhuma barbearia registrada no ecossistema ainda.
+            </div>
+          )}
         </div>
       </section>
 
+      {/* FOOTER OU INFO EXTRA SE PRECISAR */}
     </div>
   );
 }

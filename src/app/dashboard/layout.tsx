@@ -2,17 +2,19 @@ import {
   LayoutDashboard, Users, Scissors, Briefcase, Package, 
   Calendar, CalendarDays, CreditCard, Settings, 
   DollarSign, Clock, Wallet, TrendingDown, 
-  TrendingUp, BarChart2, Calculator, Scale 
+  TrendingUp, BarChart2, Calculator, Scale,
+  Star, Gift, Palette
 } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
 
 // Helper visual para evitar repetição massiva de classes grandes.
-const NavItem = ({ href, icon: Icon, label, alert }: { href: string, icon: any, label: string, alert?: boolean }) => (
+const NavItem = ({ href, icon: Icon, label, alert, badge }: { href: string, icon: any, label: string, alert?: boolean, badge?: string }) => (
   <Link href={href} className="group flex items-center gap-4 px-4 py-3.5 rounded-2xl text-zinc-400 font-medium border border-transparent hover:bg-white/[0.04] hover:text-zinc-100 hover:border-white/10 transition-all duration-300 hover:scale-[1.01] hover:shadow-lg relative">
     <Icon className={`w-5 h-5 flex-shrink-0 transition-colors ${alert ? "text-red-400/80 group-hover:text-red-400" : "group-hover:text-zinc-100"}`} />
     <span className="truncate">{label}</span>
     {alert && <span className="absolute right-3 w-2 h-2 rounded-full bg-red-500 blur-[2px] animate-pulse"></span>}
+    {badge && <span className="absolute right-3 text-[9px] font-black bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full uppercase">{badge}</span>}
   </Link>
 );
 
@@ -67,18 +69,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <NavItem href="/dashboard/pagar" icon={TrendingDown} label="Contas a Pagar (Despesas)" alert />
           <NavItem href="/dashboard/receber" icon={TrendingUp} label="Fiados a Receber" />
           
-          {/* DIVISOR RELATÓRIOS */}
+          {/* DIVISOR EXPERIÊNCIA */}
           <div className="mt-6 mb-3 px-4 flex items-center gap-3 opacity-60">
             <div className="h-px bg-gradient-to-r from-zinc-700 to-transparent flex-1"></div>
-            <span className="text-[10px] font-black tracking-[0.2em] text-zinc-400 uppercase">Avançado</span>
+            <span className="text-[10px] font-black tracking-[0.2em] text-zinc-400 uppercase">Experiência</span>
             <div className="h-px bg-gradient-to-l from-zinc-700 to-transparent flex-1"></div>
           </div>
 
-          <NavItem href="/dashboard/relatorios" icon={BarChart2} label="Relatórios Inteligentes" />
+          <NavItem href="/dashboard/relatorios" icon={BarChart2} label="Relatórios Inteligentes" badge="AI" />
           <NavItem href="/dashboard/fechamento-diario" icon={Calculator} label="Fechamento do Dia" />
           <NavItem href="/dashboard/fechamento-mensal" icon={Scale} label="Balanço Mensal" />
           <NavItem href="/dashboard/planos" icon={Package} label="Planos do App" />
-          <NavItem href="/dashboard/horarios" icon={Settings} label="Configurações Locais" />
+          <NavItem href="/dashboard/configuracoes" icon={Palette} label="Personalizar Marca" badge="novo" />
 
         </nav>
       </aside>

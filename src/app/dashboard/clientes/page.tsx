@@ -5,11 +5,11 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { getClientes } from "@/lib/db"
+import { prisma } from "@/lib/prisma"
 import { createClienteAction } from "@/app/actions"
 
-export default function ClientesPage() {
-  const clients = getClientes();
+export default async function ClientesPage() {
+  const clients = await prisma.user.findMany({ where: { role: 'CUSTOMER' }, orderBy: { createdAt: 'desc' } });
 
   return (
     <div className="p-8 md:p-12 max-w-7xl mx-auto min-h-screen">

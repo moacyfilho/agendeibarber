@@ -5,11 +5,11 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { getBarbeiros } from "@/lib/db"
+import { prisma } from "@/lib/prisma"
 import { createBarbeiroAction } from "@/app/actions"
 
-export default function BarbeirosPage() {
-  const barbers = getBarbeiros();
+export default async function BarbeirosPage() {
+  const barbers = await prisma.user.findMany({ where: { role: 'BARBER' }, orderBy: { createdAt: 'desc' } });
 
   return (
     <div className="p-8 md:p-12 max-w-7xl mx-auto min-h-screen">

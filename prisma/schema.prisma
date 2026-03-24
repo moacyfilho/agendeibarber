@@ -3,118 +3,246 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-enum Role {
-  OWNER
-  BARBER
-  CUSTOMER
-}
-
-enum SubscriptionStatus {
-  ACTIVE
-  PAST_DUE
-  CANCELED
-  UNPAID
-}
-
-enum AppointmentStatus {
-  PENDING
-  CONFIRMED
-  COMPLETED
-  CANCELED
-}
-
-enum PaymentStatus {
-  PENDING
-  PAID
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Tenant {
-  id            String         @id @default(uuid()) @db.Uuid
-  name          String         @db.VarChar(255)
-  slug          String         @unique @db.VarChar(100)
+  id            String         @id @default(uuid())
+  name          String
+  slug          String         @unique
+  isActive      Boolean        @default(true)
+  plan          String         @default("FREE")
+
+  // 🎨 Personalização da Marca
+  brandColor    String         @default("#f97316") // orange-500
+  logoUrl       String?
+  coverUrl      String?
+  address       String?
+  instagramUrl  String?
+  whatsappPhone String?
+  openingHours  String?        @default("09:00-20:00")
+  workingDays   String?        @default("1,2,3,4,5,6") // 0=Dom, 6=Sab
+
   subscriptions Subscription[]
   users         User[]
   services      Service[]
   appointments  Appointment[]
+  blockedTimes  BlockedTime[]
+  products      Product[]
+  sales         Sale[]
+  reviews       Review[]
+  loyaltyCards  LoyaltyCard[]
+  notifications NotificationLog[]
 
-  createdAt     DateTime       @default(now()) @db.Timestamptz()
-  updatedAt     DateTime       @default(now()) @db.Timestamptz()
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @default(now())
 }
 
 model Subscription {
-  id                   String             @id @default(uuid()) @db.Uuid
-  tenant               Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  tenantId             String             @db.Uuid
-  stripeCustomerId     String?            @unique @db.VarChar(255)
-  stripeSubscriptionId String?            @unique @db.VarChar(255)
-  status               SubscriptionStatus @default(ACTIVE)
-  currentPeriodEnd     DateTime           @db.Timestamptz()
-  
-  // No PostgreSQL puro faríamos GENERATED ALWAYS AS, mas no Prisma lidamos com isso no Backend ou via RAW SQL migration
-  gracePeriodEnd       DateTime           @db.Timestamptz()
+  id                   String   @id @default(uuid())
+  tenant               Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId             String
+  stripeCustomerId     String?  @unique
+  stripeSubscriptionId String?  @unique
+  status               String   @default("ACTIVE")
+  currentPeriodEnd     DateTime
+  gracePeriodEnd       DateTime
 
-  createdAt            DateTime           @default(now()) @db.Timestamptz()
-  updatedAt            DateTime           @default(now()) @db.Timestamptz()
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @default(now())
 }
 
 model User {
-  id            String        @id @default(uuid()) @db.Uuid
+  id            String        @id @default(uuid())
   tenant        Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  tenantId      String        @db.Uuid
-  role          Role
-  name          String        @db.VarChar(255)
-  email         String        @db.VarChar(255)
-  phone         String?       @db.VarChar(20)
-  passwordHash  String?       @db.VarChar(255)
-  
-  // Relacionamentos dependendo do role:
+  tenantId      String
+  role          String        // "OWNER", "BARBER", "CUSTOMER"
+  name          String
+  email         String
+  phone         String?
+  passwordHash  String?
+  avatarUrl     String?
+
+  // 💰 Configurações de Comissão (Definidas no Cadastro do Barbeiro)
+  commissionPercentage Int?    @default(50) // % para serviços normais (Avulsos)
+  valuePerHourInCents  Int?    @default(0)  // R$ fixo por hora para assinantes
+
+  // 📊 Portfólio do Barbeiro
+  bio               String?
+  specialties       String?      // Ex: "Degradê, Barba, Platinado"
+
   appointmentsAsCustomer Appointment[] @relation("CustomerAppointments")
   appointmentsAsBarber   Appointment[] @relation("BarberAppointments")
+  blockedTimes           BlockedTime[]
+  reviewsAsCustomer      Review[]      @relation("CustomerReviews")
+  reviewsAsBarber        Review[]      @relation("BarberReviews")
+  loyaltyCards           LoyaltyCard[]
 
-  createdAt     DateTime      @default(now()) @db.Timestamptz()
+  createdAt     DateTime      @default(now())
 
   @@unique([tenantId, email])
 }
 
 model Service {
-  id              String        @id @default(uuid()) @db.Uuid
+  id              String        @id @default(uuid())
   tenant          Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  tenantId        String        @db.Uuid
-  name            String        @db.VarChar(100)
-  description     String?       @db.Text
-  priceInCents    Int           // Boas práticas: valor inteiro
+  tenantId        String
+  name            String
+  description     String?
+  priceInCents    Int
   durationMinutes Int
   isActive        Boolean       @default(true)
   appointments    Appointment[]
-  
-  createdAt       DateTime      @default(now()) @db.Timestamptz()
+
+  createdAt       DateTime      @default(now())
 }
 
 model Appointment {
-  id            String             @id @default(uuid()) @db.Uuid
-  tenant        Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  tenantId      String             @db.Uuid
-  
-  customer      User               @relation("CustomerAppointments", fields: [customerId], references: [id])
-  customerId    String             @db.Uuid
-  
-  barber        User               @relation("BarberAppointments", fields: [barberId], references: [id])
-  barberId      String             @db.Uuid
+  id            String   @id @default(uuid())
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId      String
 
-  service       Service            @relation(fields: [serviceId], references: [id])
-  serviceId     String             @db.Uuid
+  customer      User     @relation("CustomerAppointments", fields: [customerId], references: [id])
+  customerId    String
 
-  scheduledAt   DateTime           @db.Timestamptz()
-  endTime       DateTime           @db.Timestamptz()
+  barber        User     @relation("BarberAppointments", fields: [barberId], references: [id])
+  barberId      String
 
-  status        AppointmentStatus  @default(PENDING)
-  paymentStatus PaymentStatus      @default(PENDING)
-  totalPrice    Int                // Snaphot do preço em centavos
+  service       Service  @relation(fields: [serviceId], references: [id])
+  serviceId     String
 
-  createdAt     DateTime           @default(now()) @db.Timestamptz()
-  updatedAt     DateTime           @default(now()) @db.Timestamptz()
+  scheduledAt   DateTime
+  endTime       DateTime
+
+  status        String   @default("PENDING") // PENDING, CONFIRMED, COMPLETED, CANCELLED, NO_SHOW
+  paymentStatus String   @default("PENDING")
+  totalPrice    Int
+
+  // 💰 Log de Repasse (Snapshot Financeiro)
+  isSubscriptionBased           Boolean @default(false)
+  commissionAmountInCents       Int?    @default(0)
+  commissionPercentageAtBooking Int?    @default(0)
+  valuePerHourAtBooking         Int?    @default(0)
+
+  // 🔔 Controle de Notificação
+  reminderSentAt  DateTime?
+  review          Review?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now())
+}
+
+model BlockedTime {
+  id          String   @id @default(uuid())
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId    String
+
+  barber      User     @relation(fields: [barberId], references: [id], onDelete: Cascade)
+  barberId    String
+
+  startTime   DateTime
+  endTime     DateTime
+  reason      String?  // Ex: "Almoço", "Férias", "Folga"
+
+  createdAt   DateTime @default(now())
+}
+
+model Product {
+  id            String   @id @default(uuid())
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId      String
+
+  name          String
+  description   String?
+  priceInCents  Int
+  stock         Int      @default(0)
+  minStock      Int      @default(5) // Alerta de estoque baixo
+  isActive      Boolean  @default(true)
+
+  saleItems     SaleItem[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Sale {
+  id            String   @id @default(uuid())
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId      String
+
+  totalPrice    Int
+  items         SaleItem[]
+
+  createdAt     DateTime @default(now())
+}
+
+model SaleItem {
+  id            String   @id @default(uuid())
+  sale          Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  saleId        String
+
+  product       Product  @relation(fields: [productId], references: [id])
+  productId     String
+
+  quantity      Int
+  priceAtSale   Int      // Preço unitário no momento da venda
+}
+
+// ⭐ Sistema de Avaliações
+model Review {
+  id            String      @id @default(uuid())
+  tenant        Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId      String
+
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  appointmentId String      @unique
+
+  customer      User        @relation("CustomerReviews", fields: [customerId], references: [id])
+  customerId    String
+
+  barber        User        @relation("BarberReviews", fields: [barberId], references: [id])
+  barberId      String
+
+  rating        Int         // 1 a 5 estrelas
+  comment       String?
+
+  createdAt     DateTime    @default(now())
+}
+
+// 🎯 Cartão Fidelidade Digital
+model LoyaltyCard {
+  id            String   @id @default(uuid())
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId      String
+
+  customer      User     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId    String
+
+  totalVisits   Int      @default(0) // Contador de visitas
+  rewardThreshold Int    @default(10) // A cada X visitas, ganha recompensa
+  rewardsEarned  Int     @default(0) // Total de recompensas já resgatadas
+  lastVisitAt   DateTime?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now())
+
+  @@unique([tenantId, customerId])
+}
+
+// 📱 Log de Notificações (WhatsApp / SMS / Push)
+model NotificationLog {
+  id          String   @id @default(uuid())
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId    String
+
+  type        String   // "REMINDER", "LOYALTY_REWARD", "RETENTION", "PROMO"
+  channel     String   // "WHATSAPP", "SMS", "EMAIL", "PUSH"
+  recipientPhone String?
+  recipientEmail String?
+  message     String
+  status      String   @default("SENT") // "SENT", "DELIVERED", "FAILED"
+
+  createdAt   DateTime @default(now())
 }
