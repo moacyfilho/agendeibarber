@@ -1,5 +1,7 @@
 import { BookingCalendar } from "@/components/BookingCalendar";
 import { prisma } from "@/lib/prisma";
+
+export const dynamic = 'force-dynamic'
 import { Scissors, Calendar, ShieldCheck, Zap, ArrowRight, Star, ChevronRight } from "lucide-react";
 import Link from "next/link";
 

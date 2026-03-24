@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+
+export const dynamic = 'force-dynamic'
 import { MapPin, Clock, Camera, Scissors, Star, ChevronRight, CheckCircle } from "lucide-react";
 import { CustomerEntryFlow } from "@/components/CustomerEntryFlow";
 
