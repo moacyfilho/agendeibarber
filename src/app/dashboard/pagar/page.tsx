@@ -1,41 +1,15 @@
-import { TrendingDown, CalendarClock } from "lucide-react"
+import { prisma } from '@/lib/prisma';
+import { getTenantId } from '@/lib/session';
+import { ContasClient } from '../contas/ContasClient';
 
-export default function ContasPagarPage() {
-  return (
-    <div className="p-6 md:p-10 lg:p-12 max-w-7xl mx-auto min-h-screen animate-fade-in-up">
-      <header className="mb-8 flex items-center gap-4">
-        <div className="page-header-icon !bg-red-500/10 !border-red-500/15 !text-red-500">
-          <TrendingDown className="w-5 h-5" />
-        </div>
-        <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Contas a Pagar</h1>
-          <p className="text-zinc-500 font-medium text-sm mt-0.5">Aluguel, luz, salários e despesas fixas</p>
-        </div>
-      </header>
+export const dynamic = 'force-dynamic';
 
-      <ul className="flex flex-col gap-4">
-        <li className="flex justify-between items-center p-6 border border-red-500/30 rounded-2xl bg-red-500/5 group">
-          <div className="flex items-center gap-6">
-            <div className="w-14 h-14 bg-red-500/20 rounded-full flex items-center justify-center text-red-500 text-xl font-black">💸</div>
-            <div>
-              <p className="font-extrabold text-white text-xl">Aluguel do Salão</p>
-              <p className="text-sm font-medium text-red-400 flex items-center gap-2">Venceu Ontem! (Dia 05)</p>
-            </div>
-          </div>
-          <p className="font-black text-3xl text-red-500">- R$ 2.450,00</p>
-        </li>
+export default async function ContasPagarPage() {
+  const tenantId = await getTenantId();
+  const bills = await prisma.bill.findMany({
+    where: { tenantId, type: 'PAGAR' },
+    orderBy: { dueDate: 'asc' },
+  });
 
-        <li className="flex justify-between items-center p-6 border border-zinc-800 rounded-2xl bg-[#0a0a0a] group">
-          <div className="flex items-center gap-6">
-            <div className="w-14 h-14 bg-zinc-900 rounded-full flex items-center justify-center text-blue-500 text-xl font-black">⚡</div>
-            <div>
-              <p className="font-extrabold text-white text-xl">Luz Enel / Cemig</p>
-              <p className="text-sm font-medium text-zinc-500 flex items-center gap-2">Vence dia 15</p>
-            </div>
-          </div>
-          <p className="font-black text-3xl text-zinc-300">R$ 320,00</p>
-        </li>
-      </ul>
-    </div>
-  )
+  return <ContasClient initialBills={bills} type="PAGAR" />;
 }

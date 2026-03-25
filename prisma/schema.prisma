@@ -36,6 +36,7 @@ model Tenant {
   loyaltyCards      LoyaltyCard[]
   notifications     NotificationLog[]
   membershipPlans   MembershipPlan[]
+  bills             Bill[]
 
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @default(now())
@@ -248,6 +249,25 @@ model MembershipPlan {
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @default(now())
+}
+
+// 💰 Contas a Pagar e Receber
+model Bill {
+  id          String    @id @default(uuid())
+  tenant      Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId    String
+
+  type        String    // "PAGAR" | "RECEBER"
+  description String
+  amountInCents Int
+  dueDate     DateTime
+  paidAt      DateTime?
+  status      String    @default("PENDING") // PENDING | PAID | OVERDUE | CANCELLED
+  category    String?   // Aluguel, Luz, Salário, Fiado, etc.
+  notes       String?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
 }
 
 // 📱 Log de Notificações (WhatsApp / SMS / Push)
