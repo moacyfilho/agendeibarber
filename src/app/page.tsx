@@ -273,24 +273,29 @@ export default function Home() {
             <p className="text-zinc-600 text-sm font-medium max-w-md mx-auto">Sem taxa por agendamento. Sem surpresas. Cancele quando quiser.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto">
 
-            {/* Free Plan */}
-            <div className="bg-[#080808] border border-zinc-900 rounded-2xl p-7 md:p-8 flex flex-col">
-              <div className="mb-6">
-                <h3 className="text-lg font-bold text-white mb-1">Grátis</h3>
-                <p className="text-zinc-600 text-xs font-medium">Para quem está começando</p>
+            {/* Starter Plan */}
+            <div className="bg-[#080808] border border-zinc-900 rounded-2xl p-6 md:p-7 flex flex-col">
+              <div className="mb-5">
+                <h3 className="text-base font-bold text-white mb-1">Starter</h3>
+                <p className="text-zinc-600 text-xs font-medium">Para quem trabalha solo</p>
               </div>
-              <div className="mb-6">
-                <span className="text-4xl font-black text-white">R$ 0</span>
-                <span className="text-zinc-600 text-sm font-medium ml-1">/mês</span>
+              <div className="mb-5">
+                <div className="flex items-end gap-0.5">
+                  <span className="text-3xl md:text-4xl font-black text-white">R$ 49</span>
+                  <span className="text-zinc-500 text-lg font-bold">,00</span>
+                </div>
+                <span className="text-zinc-600 text-xs font-medium">/mês</span>
               </div>
-              <ul className="space-y-3 mb-8 flex-1">
+              <ul className="space-y-2.5 mb-7 flex-1">
                 {[
                   '1 barbeiro',
-                  'Até 30 agendamentos/mês',
-                  'Página pública da barbearia',
-                  'Gestão básica de clientes',
+                  'Agendamentos ilimitados',
+                  'Página pública exclusiva',
+                  'Gestão de clientes',
+                  'Caixa & fechamento diário',
+                  'Programa de fidelidade',
                 ].map(item => (
                   <li key={item} className="flex items-center gap-2.5 text-[13px] text-zinc-500 font-medium">
                     <Check className="w-3.5 h-3.5 text-zinc-700 flex-shrink-0" />
@@ -300,14 +305,14 @@ export default function Home() {
               </ul>
               <Link
                 href="/auth/login"
-                className="w-full h-12 bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-sm rounded-xl transition-all flex items-center justify-center border border-zinc-800 hover:border-zinc-700"
+                className="w-full h-11 bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-sm rounded-xl transition-all flex items-center justify-center border border-zinc-800 hover:border-zinc-700"
               >
-                Criar Conta Grátis
+                Começar Agora
               </Link>
             </div>
 
-            {/* Pro Plan — HIGHLIGHT */}
-            <div className="relative bg-[#080808] rounded-2xl p-7 md:p-8 flex flex-col overflow-hidden">
+            {/* Profissional Plan — HIGHLIGHT */}
+            <div className="relative bg-[#080808] rounded-2xl p-6 md:p-7 flex flex-col overflow-hidden md:scale-[1.03]">
               {/* Gradient border */}
               <div className="absolute inset-0 rounded-2xl p-[1px] bg-gradient-to-br from-orange-500 via-orange-600 to-red-500 -z-10">
                 <div className="w-full h-full bg-[#080808] rounded-[calc(1rem-1px)]" />
@@ -318,34 +323,30 @@ export default function Home() {
                 <Crown className="w-2.5 h-2.5" /> Mais Popular
               </div>
 
-              <div className="mb-6">
-                <h3 className="text-lg font-bold text-white mb-1">Profissional</h3>
-                <p className="text-zinc-600 text-xs font-medium">Para barbearias que geram resultado</p>
+              <div className="mb-5">
+                <h3 className="text-base font-bold text-white mb-1">Profissional</h3>
+                <p className="text-zinc-600 text-xs font-medium">Para barbearias em crescimento</p>
               </div>
-              <div className="mb-6">
-                <div className="flex items-end gap-1">
-                  <span className="text-zinc-600 text-sm line-through font-medium">R$ 99,90</span>
-                </div>
-                <div className="flex items-end gap-1 mt-1">
-                  <span className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-500">R$ 49</span>
+              <div className="mb-5">
+                <div className="flex items-end gap-0.5">
+                  <span className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-500">R$ 99</span>
                   <span className="text-orange-400/60 text-lg font-bold">,90</span>
-                  <span className="text-zinc-600 text-sm font-medium ml-1">/mês</span>
                 </div>
+                <span className="text-zinc-600 text-xs font-medium">/mês</span>
                 <p className="text-[10px] font-bold text-emerald-500 mt-1.5 flex items-center gap-1">
-                  <Zap className="w-2.5 h-2.5" /> Economize R$ 600/ano · Preço de lançamento
+                  <Zap className="w-2.5 h-2.5" /> Melhor custo-benefício
                 </p>
               </div>
-              <ul className="space-y-3 mb-8 flex-1">
+              <ul className="space-y-2.5 mb-7 flex-1">
                 {[
-                  'Barbeiros ilimitados',
+                  'Até 3 barbeiros',
                   'Agendamentos ilimitados',
-                  'Caixa, comissões & fechamento',
+                  'Tudo do plano Starter',
+                  'Comissões por profissional',
                   'PDV integrado (produtos)',
-                  'Programa de fidelidade',
                   'Relatórios inteligentes',
-                  'Horários bloqueados',
                   'Contas a pagar e receber',
-                  'Suporte prioritário via WhatsApp',
+                  'Suporte prioritário',
                 ].map(item => (
                   <li key={item} className="flex items-center gap-2.5 text-[13px] text-zinc-300 font-medium">
                     <Check className="w-3.5 h-3.5 text-orange-500 flex-shrink-0" />
@@ -355,11 +356,48 @@ export default function Home() {
               </ul>
               <Link
                 href="/auth/login"
-                className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white font-black text-sm rounded-xl transition-all flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(249,115,22,0.25)] active:scale-[0.98]"
+                className="w-full h-11 bg-orange-500 hover:bg-orange-600 text-white font-black text-sm rounded-xl transition-all flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(249,115,22,0.25)] active:scale-[0.98]"
               >
                 COMEÇAR 7 DIAS GRÁTIS <ArrowRight className="w-4 h-4" />
               </Link>
-              <p className="text-[10px] text-zinc-700 text-center mt-3 font-medium">Sem cartão de crédito no trial</p>
+              <p className="text-[10px] text-zinc-700 text-center mt-2.5 font-medium">Sem cartão de crédito no trial</p>
+            </div>
+
+            {/* Premium Plan */}
+            <div className="bg-[#080808] border border-zinc-900 rounded-2xl p-6 md:p-7 flex flex-col">
+              <div className="mb-5">
+                <h3 className="text-base font-bold text-white mb-1">Premium</h3>
+                <p className="text-zinc-600 text-xs font-medium">Para operações com equipe grande</p>
+              </div>
+              <div className="mb-5">
+                <div className="flex items-end gap-0.5">
+                  <span className="text-3xl md:text-4xl font-black text-white">R$ 149</span>
+                  <span className="text-zinc-500 text-lg font-bold">,90</span>
+                </div>
+                <span className="text-zinc-600 text-xs font-medium">/mês</span>
+              </div>
+              <ul className="space-y-2.5 mb-7 flex-1">
+                {[
+                  'Até 6 barbeiros',
+                  'Agendamentos ilimitados',
+                  'Tudo do plano Profissional',
+                  'Múltiplas unidades',
+                  'Relatórios avançados',
+                  'Fechamento mensal completo',
+                  'Suporte VIP via WhatsApp',
+                ].map(item => (
+                  <li key={item} className="flex items-center gap-2.5 text-[13px] text-zinc-500 font-medium">
+                    <Check className="w-3.5 h-3.5 text-purple-500 flex-shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/auth/login"
+                className="w-full h-11 bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-sm rounded-xl transition-all flex items-center justify-center border border-zinc-800 hover:border-zinc-700"
+              >
+                Assinar Premium
+              </Link>
             </div>
           </div>
 
