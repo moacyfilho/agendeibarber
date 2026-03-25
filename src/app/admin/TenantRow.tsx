@@ -1,6 +1,6 @@
 "use client";
 
-import { Power, ArrowRight, Loader2, Trash2 } from "lucide-react";
+import { Power, ArrowRight, Loader2, Trash2, ExternalLink, Users, Calendar, Briefcase, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toggleTenantStatusAction, deleteTenantAction } from "@/app/actions";
@@ -22,8 +22,7 @@ export function TenantRow({ t }: { t: any }) {
   }
 
   async function handleDelete() {
-    if (!confirm(`Tem certeza que deseja EXCLUIR permanentemente a barbearia "${t.name}"? Todos os dados (clientes, agendamentos, etc) serão apagados.`)) return;
-    
+    if (!confirm(`Tem certeza que deseja EXCLUIR permanentemente "${t.name}"? Todos os dados serão apagados.`)) return;
     setLoading(true);
     try {
       await deleteTenantAction(t.id);
@@ -34,57 +33,100 @@ export function TenantRow({ t }: { t: any }) {
     }
   }
 
+  const userCount = t._count?.users ?? 0;
+  const serviceCount = t._count?.services ?? 0;
+  const appointmentCount = t._count?.appointments ?? 0;
+
   return (
-    <div className={`flex flex-col md:flex-row md:justify-between md:items-center p-6 border rounded-3xl transition-all group ${t.isActive ? 'border-zinc-800 bg-zinc-950/50 hover:bg-zinc-900 hover:border-emerald-500/30' : 'border-red-900/30 bg-red-950/5 opacity-80'}`}>
-      <div className="flex items-center gap-6">
-        <div className={`w-16 h-16 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center font-black text-2xl transition-colors ${t.isActive ? 'text-zinc-500 group-hover:text-emerald-500' : 'text-zinc-700'}`}>
+    <div
+      className={`group relative flex flex-col lg:flex-row lg:justify-between lg:items-center p-5 md:p-6 border rounded-xl transition-all duration-300 ${
+        t.isActive
+          ? 'border-zinc-900 bg-zinc-950/30 hover:bg-zinc-950/60 hover:border-emerald-500/20'
+          : 'border-red-900/20 bg-red-950/5 opacity-75 hover:opacity-100'
+      }`}
+    >
+      {/* Left: Identity */}
+      <div className="flex items-start gap-4 min-w-0">
+        <div
+          className={`w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg transition-all flex-shrink-0 ${
+            t.isActive
+              ? 'bg-zinc-900 border border-zinc-800 text-zinc-500 group-hover:text-emerald-400 group-hover:border-emerald-500/30 group-hover:bg-emerald-500/5'
+              : 'bg-red-950/30 border border-red-900/30 text-red-500/50'
+          }`}
+        >
           {t.name.charAt(0).toUpperCase()}
         </div>
-        <div>
-          <div className="flex items-center gap-3">
-             <p className="font-extrabold text-white text-xl mb-1">{t.name}</p>
-             {!t.isActive && <span className="text-[10px] bg-red-500 text-white px-2 py-0.5 rounded-full font-black uppercase">Bloqueado</span>}
+        <div className="min-w-0">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <p className="font-bold text-white text-base truncate">{t.name}</p>
+            {!t.isActive && (
+              <span className="text-[8px] bg-red-500/15 text-red-400 border border-red-500/20 px-2 py-0.5 rounded font-black uppercase tracking-wider">
+                Bloqueado
+              </span>
+            )}
+            {t.isActive && (
+              <span className="text-[8px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/15 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
+                Ativo
+              </span>
+            )}
           </div>
-          <a 
-            href={`/${t.slug}`} 
+          <a
+            href={`/${t.slug}`}
             target="_blank"
-            className="text-sm font-medium text-zinc-400 flex items-center gap-2 hover:text-emerald-400 transition-colors"
+            className="text-[11px] font-medium text-zinc-600 flex items-center gap-1.5 mt-1 hover:text-emerald-400 transition-colors group/link"
           >
-            app.agendeibarber.com.br/<span className="text-emerald-400 underline">{t.slug}</span>
-            <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
+            /{t.slug}
+            <ExternalLink className="w-2.5 h-2.5 opacity-0 group-hover/link:opacity-100 transition-opacity" />
           </a>
+
+          {/* Stats mini-bar */}
+          <div className="flex items-center gap-3 mt-2.5">
+            <span className="flex items-center gap-1 text-[10px] font-medium text-zinc-600">
+              <Users className="w-2.5 h-2.5" /> {userCount}
+            </span>
+            <span className="flex items-center gap-1 text-[10px] font-medium text-zinc-600">
+              <Briefcase className="w-2.5 h-2.5" /> {serviceCount}
+            </span>
+            <span className="flex items-center gap-1 text-[10px] font-medium text-zinc-600">
+              <Calendar className="w-2.5 h-2.5" /> {appointmentCount}
+            </span>
+          </div>
         </div>
       </div>
-      <div className="mt-5 md:mt-0 flex flex-wrap items-center gap-4">
-        <span className="text-xs text-zinc-500 font-bold block">
-           Desde: {format(new Date(t.createdAt), "MMM yyyy", { locale: ptBR })}
+
+      {/* Right: Metadata + Actions */}
+      <div className="mt-4 lg:mt-0 flex flex-wrap items-center gap-2.5">
+        <div className="flex items-center gap-1.5 text-[10px] font-medium text-zinc-600 bg-zinc-900/50 border border-zinc-800/50 px-2.5 py-1.5 rounded-lg">
+          <Clock className="w-2.5 h-2.5" />
+          {format(new Date(t.createdAt), "dd MMM yyyy", { locale: ptBR })}
+        </div>
+
+        <span className="text-[10px] font-bold bg-zinc-900 text-zinc-400 px-3 py-1.5 rounded-lg border border-zinc-800">
+          {t.plan || 'Free'}
         </span>
-        <span className="font-bold text-sm bg-zinc-800 text-zinc-300 px-4 py-2 rounded-xl border border-zinc-700">
-          {t.plan || 'Base Plan'}
-        </span>
-        
-        <span className={`font-black text-[10px] px-3 py-2 rounded-xl tracking-widest uppercase border ${t.isActive ? 'text-green-400 bg-green-500/10 border-green-500/20' : 'text-red-500 bg-red-500/10 border-red-500/20'}`}>
-          {t.isActive ? 'PAGAMENTO OK' : 'INADIMPLENTE'}
-        </span>
-        
+
         <EditTenantModal t={t} />
 
-        <button 
+        <button
           onClick={handleDelete}
           disabled={loading}
           title="Excluir Barbearia"
-          className="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-500 hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/50 transition-all disabled:opacity-50"
+          className="w-9 h-9 rounded-lg bg-zinc-900/50 border border-zinc-800/50 flex items-center justify-center text-zinc-600 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/30 transition-all disabled:opacity-50"
         >
-          {loading ? <Loader2 className="animate-spin w-5 h-5" /> : <Trash2 className="w-5 h-5" />}
+          {loading ? <Loader2 className="animate-spin w-3.5 h-3.5" /> : <Trash2 className="w-3.5 h-3.5" />}
         </button>
 
-        <button 
+        <button
           onClick={handleToggle}
           disabled={loading}
           title={t.isActive ? "Bloquear Barbearia" : "Ativar Barbearia"}
-          className={`w-12 h-12 rounded-xl border flex items-center justify-center transition-all ${t.isActive ? 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white hover:bg-emerald-500 hover:border-emerald-500' : 'bg-emerald-500 border-emerald-500 text-zinc-950 hover:bg-emerald-400'}`}
+          className={`w-9 h-9 rounded-lg border flex items-center justify-center transition-all disabled:opacity-50 ${
+            t.isActive
+              ? 'bg-zinc-900/50 border-zinc-800/50 text-zinc-600 hover:text-white hover:bg-emerald-500 hover:border-emerald-500 hover:shadow-[0_0_12px_rgba(16,185,129,0.3)]'
+              : 'bg-emerald-500 border-emerald-500 text-white hover:bg-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.3)]'
+          }`}
         >
-          {loading ? <Loader2 className="animate-spin w-5 h-5" /> : <Power className="w-5 h-5 group-hover:scale-110 transition-transform" />}
+          {loading ? <Loader2 className="animate-spin w-3.5 h-3.5" /> : <Power className="w-3.5 h-3.5" />}
         </button>
       </div>
     </div>

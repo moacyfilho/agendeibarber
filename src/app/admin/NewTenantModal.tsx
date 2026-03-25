@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, X, Loader2, Eye, EyeOff } from "lucide-react";
+import { Plus, X, Loader2, Eye, EyeOff, Building2, User, Mail, Lock } from "lucide-react";
 import { createTenantAction } from "@/app/actions";
 
 export function NewTenantModal() {
@@ -38,32 +38,43 @@ export function NewTenantModal() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold h-14 px-8 rounded-xl text-lg shadow-[0_0_30px_rgba(16,185,129,0.3)] transition-all active:scale-95 flex items-center gap-2"
+        className="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold h-11 px-6 rounded-xl text-sm shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all active:scale-95 flex items-center gap-2"
       >
-        <Plus className="w-6 h-6" /> Cadastrar Nova Barbearia
+        <Plus className="w-4 h-4" /> Nova Barbearia
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
-          <div className="bg-zinc-950 border border-zinc-800 p-8 rounded-[2rem] shadow-2xl w-full max-w-md relative animate-in zoom-in-95 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in" onClick={() => setIsOpen(false)}>
+          <div
+            className="bg-[#0a0a0a] border border-zinc-800 p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md relative animate-in zoom-in-95 max-h-[90vh] overflow-y-auto"
+            onClick={e => e.stopPropagation()}
+          >
             <button
               onClick={() => setIsOpen(false)}
-              className="absolute top-6 right-6 text-zinc-500 hover:text-white"
+              className="absolute top-5 right-5 text-zinc-600 hover:text-white transition-colors p-1"
             >
-              <X className="w-6 h-6" />
+              <X className="w-5 h-5" />
             </button>
-            <h3 className="text-2xl font-black text-white mb-1">Nova Barbearia</h3>
-            <p className="text-zinc-500 text-sm mb-6">Preencha os dados para criar o ambiente e o acesso do dono.</p>
+
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/15 rounded-xl text-emerald-400">
+                <Building2 className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-lg font-black text-white">Nova Barbearia</h3>
+                <p className="text-zinc-600 text-xs mt-0.5">Crie o ambiente e o acesso do dono</p>
+              </div>
+            </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
-              {/* SEÇÃO: BARBEARIA */}
-              <div className="text-[10px] font-black text-emerald-500 uppercase tracking-widest border-b border-zinc-800 pb-2 mb-1">
-                Dados da Barbearia
+              {/* Seção: Barbearia */}
+              <div className="text-[9px] font-bold text-emerald-500/60 uppercase tracking-[0.15em] border-b border-zinc-900 pb-2 mb-1 flex items-center gap-2">
+                <Building2 className="w-2.5 h-2.5" /> Dados da Barbearia
               </div>
 
               <div>
-                <label className="text-sm font-bold text-zinc-400 mb-2 block">Nome da Barbearia</label>
+                <label className="text-[11px] font-bold text-zinc-500 mb-1.5 block ml-0.5">Nome da Barbearia</label>
                 <input
                   type="text"
                   name="name"
@@ -71,14 +82,14 @@ export function NewTenantModal() {
                   value={nameValue}
                   onChange={e => setNameValue(e.target.value)}
                   placeholder="Ex: Navalha de Ouro"
-                  className="w-full bg-zinc-900 border border-zinc-800 h-12 rounded-xl px-4 text-white focus:outline-none focus:border-emerald-500 transition-colors"
+                  className="w-full bg-zinc-900/50 border border-zinc-800 h-11 rounded-xl px-4 text-white text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition-all placeholder:text-zinc-700"
                 />
               </div>
 
               <div>
-                <label className="text-sm font-bold text-zinc-400 mb-2 block">
+                <label className="text-[11px] font-bold text-zinc-500 mb-1.5 block ml-0.5">
                   Slug (URL)
-                  <span className="text-zinc-600 font-normal ml-2 text-xs">gerado automaticamente</span>
+                  <span className="text-zinc-700 font-normal ml-1.5">gerado automaticamente</span>
                 </label>
                 <input
                   type="text"
@@ -86,58 +97,64 @@ export function NewTenantModal() {
                   required
                   value={generateSlug(nameValue)}
                   readOnly
-                  placeholder="navalha-de-ouro"
-                  className="w-full bg-zinc-900/50 border border-zinc-800 h-12 rounded-xl px-4 text-zinc-400 focus:outline-none cursor-default text-sm"
+                  className="w-full bg-zinc-950/50 border border-zinc-800/50 h-11 rounded-xl px-4 text-zinc-500 text-sm focus:outline-none cursor-default"
                 />
-                <p className="text-zinc-600 text-xs mt-1">
-                  Acesso: agendeibarber.vercel.app/<span className="text-zinc-400">{generateSlug(nameValue) || 'slug'}</span>
+                <p className="text-zinc-700 text-[10px] mt-1 ml-0.5">
+                  Acesso: <span className="text-emerald-500/60">agendeibarber.vercel.app/<strong>{generateSlug(nameValue) || 'slug'}</strong></span>
                 </p>
               </div>
 
-              {/* SEÇÃO: ACESSO */}
-              <div className="text-[10px] font-black text-emerald-500 uppercase tracking-widest border-b border-zinc-800 pb-2 mt-2 mb-1">
-                Acesso do Dono
+              {/* Seção: Acesso */}
+              <div className="text-[9px] font-bold text-emerald-500/60 uppercase tracking-[0.15em] border-b border-zinc-900 pb-2 mt-2 mb-1 flex items-center gap-2">
+                <User className="w-2.5 h-2.5" /> Acesso do Dono
               </div>
 
               <div>
-                <label className="text-sm font-bold text-zinc-400 mb-2 block">Nome do Responsável</label>
-                <input
-                  type="text"
-                  name="ownerName"
-                  required
-                  placeholder="Ex: João Silva"
-                  className="w-full bg-zinc-900 border border-zinc-800 h-12 rounded-xl px-4 text-white focus:outline-none focus:border-emerald-500 transition-colors"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-bold text-zinc-400 mb-2 block">E-mail de Login</label>
-                <input
-                  type="email"
-                  name="ownerEmail"
-                  required
-                  placeholder="dono@barbearia.com"
-                  className="w-full bg-zinc-900 border border-zinc-800 h-12 rounded-xl px-4 text-white focus:outline-none focus:border-emerald-500 transition-colors"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-bold text-zinc-400 mb-2 block">Senha de Acesso</label>
+                <label className="text-[11px] font-bold text-zinc-500 mb-1.5 block ml-0.5">Nome do Responsável</label>
                 <div className="relative">
+                  <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-700" />
+                  <input
+                    type="text"
+                    name="ownerName"
+                    required
+                    placeholder="Ex: João Silva"
+                    className="w-full bg-zinc-900/50 border border-zinc-800 h-11 rounded-xl pl-10 pr-4 text-white text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition-all placeholder:text-zinc-700"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[11px] font-bold text-zinc-500 mb-1.5 block ml-0.5">E-mail de Login</label>
+                <div className="relative">
+                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-700" />
+                  <input
+                    type="email"
+                    name="ownerEmail"
+                    required
+                    placeholder="dono@barbearia.com"
+                    className="w-full bg-zinc-900/50 border border-zinc-800 h-11 rounded-xl pl-10 pr-4 text-white text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition-all placeholder:text-zinc-700"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[11px] font-bold text-zinc-500 mb-1.5 block ml-0.5">Senha de Acesso</label>
+                <div className="relative">
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-700" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     name="ownerPassword"
                     required
                     minLength={6}
                     placeholder="Mínimo 6 caracteres"
-                    className="w-full bg-zinc-900 border border-zinc-800 h-12 rounded-xl px-4 pr-11 text-white focus:outline-none focus:border-emerald-500 transition-colors"
+                    className="w-full bg-zinc-900/50 border border-zinc-800 h-11 rounded-xl pl-10 pr-11 text-white text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition-all placeholder:text-zinc-700"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(v => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-600 hover:text-zinc-300 transition-colors"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                   </button>
                 </div>
               </div>
@@ -145,9 +162,9 @@ export function NewTenantModal() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full h-14 bg-emerald-500 hover:bg-emerald-400 rounded-xl font-bold text-zinc-950 mt-2 transition-all flex items-center justify-center disabled:opacity-50 gap-2"
+                className="w-full h-12 bg-emerald-500 hover:bg-emerald-400 rounded-xl font-bold text-white text-sm mt-2 transition-all flex items-center justify-center disabled:opacity-50 gap-2 shadow-[0_0_20px_rgba(16,185,129,0.15)] active:scale-[0.98]"
               >
-                {loading ? <Loader2 className="animate-spin w-5 h-5" /> : "Criar Ambiente e Acesso"}
+                {loading ? <Loader2 className="animate-spin w-4 h-4" /> : "Criar Ambiente e Acesso"}
               </button>
             </form>
           </div>
