@@ -9,7 +9,7 @@ import { EditTenantModal } from "./EditTenantModal";
 
 const PLANS = [
   { value: 'FREE', label: 'Free', color: 'text-zinc-400 border-zinc-700 bg-zinc-900' },
-  { value: 'PROFISSIONAL', label: 'Profissional', color: 'text-orange-400 border-orange-500/30 bg-orange-500/10' },
+  { value: 'STARTER', label: 'Starter R$49,90', color: 'text-orange-400 border-orange-500/30 bg-orange-500/10' },
   { value: 'ENTERPRISE', label: 'Enterprise', color: 'text-purple-400 border-purple-500/30 bg-purple-500/10' },
 ];
 
