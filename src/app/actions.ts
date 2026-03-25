@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { Resend } from 'resend';
+import bcrypt from 'bcryptjs';
 
 // Only initialize Resend if the API key is provided.
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
@@ -19,25 +20,41 @@ async function getTenantContext() {
 export async function createTenantAction(formData: FormData) {
   const name = formData.get('name') as string;
   const rawSlug = formData.get('slug') as string;
+  const ownerName = formData.get('ownerName') as string;
+  const ownerEmail = formData.get('ownerEmail') as string;
+  const ownerPassword = formData.get('ownerPassword') as string;
 
   if (!name || !rawSlug) return { error: "Nome e Slug obrigatórios" };
+  if (!ownerName || !ownerEmail || !ownerPassword) return { error: "Nome, e-mail e senha do responsável são obrigatórios" };
+  if (ownerPassword.length < 6) return { error: "A senha deve ter no mínimo 6 caracteres" };
 
-  // Sanitização do Slug: remove espaços, coloca em minusculo e remove caracteres especiais básicos
   const slug = rawSlug
     .trim()
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // remove acentos
-    .replace(/\s+/g, '-')           // troca espaços por hífen
-    .replace(/[^\w-]+/g, '');        // remove o que não for letra/numero/hifen
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, '-')
+    .replace(/[^\w-]+/g, '');
+
+  // Verifica se e-mail já está em uso
+  const existingUser = await prisma.user.findFirst({ where: { email: ownerEmail } });
+  if (existingUser) return { error: "Este e-mail já está cadastrado no sistema." };
 
   try {
-    await prisma.tenant.create({
+    const passwordHash = await bcrypt.hash(ownerPassword, 12);
+
+    const tenant = await prisma.tenant.create({ data: { name, slug } });
+
+    await prisma.user.create({
       data: {
-        name,
-        slug
+        tenantId: tenant.id,
+        name: ownerName,
+        email: ownerEmail,
+        passwordHash,
+        role: 'OWNER',
       }
     });
+
     revalidatePath('/admin');
     return { success: true };
   } catch (error) {
