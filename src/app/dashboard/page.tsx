@@ -69,7 +69,8 @@ export default async function DashboardPage() {
     where: { tenantId: tenant?.id },
     orderBy: { createdAt: 'desc' }
   });
-  const isSubscribed = subscription && subscription.status === 'ACTIVE';
+  const hasPlan = tenant?.plan && tenant.plan !== 'FREE' && tenant.plan !== null && tenant.plan !== '';
+  const isSubscribed = (subscription && subscription.status === 'ACTIVE') || hasPlan;
 
   const greeting = (() => {
     const h = now.getHours();

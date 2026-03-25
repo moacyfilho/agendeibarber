@@ -18,8 +18,18 @@ export default async function AssinaturasPage({ searchParams }: { searchParams: 
     orderBy: { createdAt: 'desc' }
   });
 
-  const isSubscribed = subscription && subscription.status === 'ACTIVE';
+  const hasPlan = tenant?.plan && tenant.plan !== 'FREE' && tenant.plan !== null && tenant.plan !== '';
+  const isSubscribed = (subscription && subscription.status === 'ACTIVE') || hasPlan;
   const isGracePeriod = subscription && subscription.status === 'PAST_DUE';
+
+  const planLabel: Record<string, string> = {
+    STARTER: 'Starter',
+    PROFISSIONAL: 'Profissional',
+    PREMIUM: 'Premium',
+  };
+  const currentPlanName = tenant?.plan && planLabel[tenant.plan]
+    ? planLabel[tenant.plan]
+    : (isSubscribed ? 'Pro' : 'Free Trial');
 
   return (
     <div className="p-6 md:p-10 lg:p-12 max-w-7xl mx-auto min-h-screen animate-fade-in-up">
@@ -55,7 +65,7 @@ export default async function AssinaturasPage({ searchParams }: { searchParams: 
             <div>
               <p className="text-zinc-500 font-bold uppercase tracking-widest text-sm mb-2">Plano Atual</p>
               <h3 className="text-4xl font-black text-white flex items-center gap-3">
-                {isSubscribed ? "Barbearia Pro" : "Free Trial"} 
+                {currentPlanName}
                 {isSubscribed && <CheckCircle2 className="text-green-500 w-6 h-6" />}
               </h3>
             </div>
