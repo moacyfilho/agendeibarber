@@ -55,10 +55,9 @@ interface Props {
   services: Service[];
   initialAppointments: Appointment[];
   tenantId: string;
-  todayIso: string; // ISO date string from server to avoid hydration mismatch
 }
 
-export function AgendaClient({ barbers, services, initialAppointments, tenantId, todayIso }: Props) {
+export function AgendaClient({ barbers, services, initialAppointments, tenantId }: Props) {
   const [mounted, setMounted] = useState(false);
   const [viewMode, setViewMode] = useState<'day' | 'week'>('day');
   const [currentDate, setCurrentDate] = useState<Date | null>(null);
@@ -142,7 +141,8 @@ export function AgendaClient({ barbers, services, initialAppointments, tenantId,
     ? format(currentDate, "d 'de' MMMM", { locale: ptBR })
     : `${format(weekDays[0], 'd MMM', { locale: ptBR })} – ${format(weekDays[6], 'd MMM', { locale: ptBR })}`;
 
-  const todayStr = todayIso.slice(0, 10);
+  // Usa o horário local do cliente (UTC-4 Manaus) — não o UTC do servidor
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
   const isToday = (d: Date) => format(d, 'yyyy-MM-dd') === todayStr;
 
   return (

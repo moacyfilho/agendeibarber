@@ -62,7 +62,6 @@ export default async function AgendaPage() {
           services={services}
           initialAppointments={serialized as any}
           tenantId={tenantId}
-          todayIso={new Date().toISOString()}
         />
       </div>
     </div>
