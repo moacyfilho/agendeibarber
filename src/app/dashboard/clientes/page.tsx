@@ -7,9 +7,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from "@/components/ui/label"
 import { prisma } from "@/lib/prisma"
 import { createClienteAction } from "@/app/actions"
+import { getTenantId } from '@/lib/session'
 
 export default async function ClientesPage() {
-  const clients = await prisma.user.findMany({ where: { role: 'CUSTOMER' }, orderBy: { createdAt: 'desc' } });
+  const tenantId = await getTenantId();
+  const clients = await prisma.user.findMany({ where: { role: 'CUSTOMER', tenantId }, orderBy: { createdAt: 'desc' } });
 
   return (
     <div className="p-6 md:p-10 lg:p-12 max-w-7xl mx-auto min-h-screen animate-fade-in-up">

@@ -1,8 +1,10 @@
 import { CalendarRange, Activity, FileText, CheckCircle2, ShoppingBag, Scissors } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 import { Badge } from "@/components/ui/badge"
+import { getTenantId } from '@/lib/session'
 
 export default async function FechamentoDiarioPage() {
+  const tenantId = await getTenantId();
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
 
@@ -12,6 +14,7 @@ export default async function FechamentoDiarioPage() {
   // 1. Atendimentos de hoje
   const todaysAppointments = await prisma.appointment.findMany({
     where: {
+      tenantId,
       scheduledAt: { gte: todayStart, lte: todayEnd }
     },
     include: {
@@ -25,6 +28,7 @@ export default async function FechamentoDiarioPage() {
   // 2. Vendas de produtos de hoje
   const todaysSales = await prisma.sale.findMany({
     where: {
+      tenantId,
       createdAt: { gte: todayStart, lte: todayEnd }
     },
     include: {

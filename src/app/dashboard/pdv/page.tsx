@@ -1,10 +1,12 @@
 import { prisma } from "@/lib/prisma"
 import { Package, ShoppingCart, Info } from "lucide-react"
 import { PDVClient } from "@/components/PDVClient"
+import { getTenantId } from '@/lib/session'
 
 export default async function PDVPage() {
+  const tenantId = await getTenantId();
   const products = await prisma.product.findMany({
-    where: { isActive: true },
+    where: { isActive: true, tenantId },
     orderBy: { name: 'asc' }
   });
 

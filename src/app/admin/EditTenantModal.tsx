@@ -1,12 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { X, Loader2, Edit3, Building2, Globe } from "lucide-react";
 import { updateTenantAction } from "@/app/actions";
 
 export function EditTenantModal({ t }: { t: any }) {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -32,8 +36,8 @@ export function EditTenantModal({ t }: { t: any }) {
         <Edit3 className="w-3.5 h-3.5" />
       </button>
 
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in" onClick={() => setIsOpen(false)}>
+      {isOpen && mounted && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in" onClick={() => setIsOpen(false)}>
           <div
             className="bg-[#0a0a0a] border border-zinc-800 p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md relative animate-in zoom-in-95"
             onClick={e => e.stopPropagation()}
@@ -93,7 +97,7 @@ export function EditTenantModal({ t }: { t: any }) {
             </form>
           </div>
         </div>
-      )}
+      , document.body)}
     </>
   );
 }

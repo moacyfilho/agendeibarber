@@ -3,8 +3,10 @@ import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { OnboardingWizard } from "@/components/OnboardingWizard"
+import { getTenantId } from '@/lib/session'
 
 export default async function DashboardPage() {
+  const tenantId = await getTenantId();
   const now = new Date();
   const startOfDay = new Date(now);
   startOfDay.setHours(0, 0, 0, 0);
@@ -15,6 +17,7 @@ export default async function DashboardPage() {
 
   const completedToday = await prisma.appointment.findMany({
     where: {
+      tenantId,
       status: 'COMPLETED',
       paymentStatus: 'PAID',
       scheduledAt: { gte: startOfDay, lte: endOfDay }
@@ -22,7 +25,7 @@ export default async function DashboardPage() {
   });
 
   const productSalesToday = await prisma.sale.findMany({
-    where: { createdAt: { gte: startOfDay, lte: endOfDay } },
+    where: { tenantId, createdAt: { gte: startOfDay, lte: endOfDay } },
     include: { items: true }
   });
 
@@ -34,6 +37,7 @@ export default async function DashboardPage() {
 
   const totalAppointmentsToday = await prisma.appointment.count({
     where: {
+      tenantId,
       status: { in: ['CONFIRMED', 'COMPLETED'] },
       scheduledAt: { gte: startOfDay, lte: endOfDay }
     }
@@ -41,6 +45,7 @@ export default async function DashboardPage() {
 
   const newCustomersMonth = await prisma.user.count({
     where: {
+      tenantId,
       role: 'CUSTOMER',
       createdAt: { gte: startOfMonth }
     }
@@ -48,6 +53,7 @@ export default async function DashboardPage() {
 
   const appointments = await prisma.appointment.findMany({
     where: {
+      tenantId,
       status: 'CONFIRMED',
       scheduledAt: { gte: now }
     },
@@ -56,7 +62,7 @@ export default async function DashboardPage() {
     take: 4
   });
 
-  const tenant = await prisma.tenant.findUnique({ where: { slug: 'matriz' } });
+  const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
   const showOnboarding = tenant?.name === 'Matriz - Agendei Barber';
 
   const subscription = await prisma.subscription.findFirst({

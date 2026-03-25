@@ -2,9 +2,12 @@ import { prisma } from "@/lib/prisma"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { ShoppingBag, ArrowLeft, Calendar, Tag } from "lucide-react"
 import Link from "next/link"
+import { getTenantId } from '@/lib/session'
 
 export default async function VendasLogPage() {
+  const tenantId = await getTenantId();
   const sales = await prisma.sale.findMany({
+    where: { tenantId },
     orderBy: { createdAt: 'desc' },
     include: {
       items: {

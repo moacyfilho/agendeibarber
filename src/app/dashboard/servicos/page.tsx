@@ -6,9 +6,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from "@/components/ui/label"
 import { prisma } from "@/lib/prisma"
 import { createServicoAction } from "@/app/actions"
+import { getTenantId } from '@/lib/session'
 
 export default async function ServicosPage() {
-  const servicos = await prisma.service.findMany({ orderBy: { createdAt: 'desc' } });
+  const tenantId = await getTenantId();
+  const servicos = await prisma.service.findMany({ where: { tenantId }, orderBy: { createdAt: 'desc' } });
 
   return (
     <div className="p-6 md:p-10 lg:p-12 max-w-7xl mx-auto min-h-screen animate-fade-in-up">

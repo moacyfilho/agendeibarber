@@ -4,17 +4,14 @@ import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { Resend } from 'resend';
 import bcrypt from 'bcryptjs';
+import { getTenantId } from '@/lib/session';
 
 // Only initialize Resend if the API key is provided.
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-// Helper: Auto-cria a barbearia local caso não exista (Para dev direto)
+// Usa a sessão do usuário logado para obter o tenantId correto
 async function getTenantContext() {
-  let tenant = await prisma.tenant.findUnique({ where: { slug: 'matriz' } });
-  if (!tenant) {
-    tenant = await prisma.tenant.create({ data: { name: 'Matriz - Agendei Barber', slug: 'matriz' }});
-  }
-  return tenant.id;
+  return getTenantId();
 }
 
 export async function createTenantAction(formData: FormData) {

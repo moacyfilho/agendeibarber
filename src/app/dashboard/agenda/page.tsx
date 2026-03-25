@@ -3,21 +3,23 @@ import { BookingCalendar } from "@/components/BookingCalendar"
 import { ComandaModal } from "@/components/ComandaModal"
 import { prisma } from "@/lib/prisma"
 import { Badge } from "@/components/ui/badge"
+import { getTenantId } from '@/lib/session'
 
 export default async function AgendaPage() {
-  const barbers = await prisma.user.findMany({ where: { role: 'BARBER' } });
-  const services = await prisma.service.findMany({ where: { isActive: true } });
+  const tenantId = await getTenantId();
+  const barbers = await prisma.user.findMany({ where: { role: 'BARBER', tenantId } });
+  const services = await prisma.service.findMany({ where: { isActive: true, tenantId } });
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   const appointments = await prisma.appointment.findMany({
-    where: { scheduledAt: { gte: today } },
+    where: { scheduledAt: { gte: today }, tenantId },
     include: { customer: true, barber: true, service: true },
     orderBy: { scheduledAt: 'asc' }
   });
 
-  const products = await prisma.product.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } });
+  const products = await prisma.product.findMany({ where: { isActive: true, tenantId }, orderBy: { name: 'asc' } });
 
   return (
     <div className="p-6 md:p-10 lg:p-12 max-w-7xl mx-auto min-h-screen animate-fade-in-up">

@@ -3,16 +3,19 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { prisma } from "@/lib/prisma"
+import { getTenantId } from '@/lib/session'
 
 export default async function ComissoesPage() {
+  const tenantId = await getTenantId();
   // Busca todos os barbeiros
   const barbers = await prisma.user.findMany({
-    where: { role: 'BARBER' }
+    where: { role: 'BARBER', tenantId }
   });
 
   // Busca todos os agendamentos já pagos e finalizados
   const paidAppointments = await prisma.appointment.findMany({
     where: {
+      tenantId,
       status: 'COMPLETED',
       paymentStatus: 'PAID'
     },

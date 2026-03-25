@@ -1,10 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { getTenantId } from '@/lib/session';
 import { Settings, Palette, MapPin, Camera, Phone, Clock, Save } from "lucide-react";
 import { redirect } from "next/navigation";
 
-async function getTenantForDashboard() {
-  const tenant = await prisma.tenant.findFirst();
+async function getTenantForDashboard(tenantId: string) {
+  const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
   return tenant;
 }
 
@@ -26,7 +27,8 @@ async function updateBrandSettings(formData: FormData) {
 }
 
 export default async function ConfiguracoesPage() {
-  const tenant = await getTenantForDashboard();
+  const tenantId = await getTenantId();
+  const tenant = await getTenantForDashboard(tenantId);
   if (!tenant) return <div className="text-white p-10 text-xl">Nenhum tenant encontrado.</div>;
 
   return (

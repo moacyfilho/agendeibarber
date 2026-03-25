@@ -1,7 +1,9 @@
 import { Wallet, ArrowUpCircle, ArrowDownCircle, Info } from "lucide-react"
 import { prisma } from "@/lib/prisma"
+import { getTenantId } from '@/lib/session'
 
 export default async function CaixaPage() {
+  const tenantId = await getTenantId();
   // Lógica simplificada. Num app real, fazemos queries baseadas no timezone do tenant.
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -9,6 +11,7 @@ export default async function CaixaPage() {
   // Busca Agendamentos Pagos Totais
   const appointmentsPaidGlobally = await prisma.appointment.findMany({
     where: {
+      tenantId,
       paymentStatus: 'PAID'
     }
   });
@@ -16,6 +19,7 @@ export default async function CaixaPage() {
   // Busca Agendamentos Pagos Hoje
   const appointmentsPaidToday = await prisma.appointment.findMany({
     where: {
+      tenantId,
       paymentStatus: 'PAID',
       scheduledAt: {
         gte: today

@@ -4,9 +4,11 @@ import { Badge } from "@/components/ui/badge"
 import { prisma } from "@/lib/prisma"
 import { createStripeCheckoutSessionAction } from "@/app/actions"
 import { redirect } from "next/navigation"
+import { getTenantId } from '@/lib/session'
 
 export default async function AssinaturasPage({ searchParams }: { searchParams: { success?: string, canceled?: string } }) {
-  const tenant = await prisma.tenant.findUnique({ where: { slug: 'matriz' } });
+  const tenantId = await getTenantId();
+  const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
   
   if (!tenant) return <div>Tenant não encontrado. Favor voltar ao dashboard.</div>;
 

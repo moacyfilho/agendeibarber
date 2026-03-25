@@ -4,9 +4,12 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { prisma } from "@/lib/prisma"
 import { updateAppointmentStatusAction, updateAppointmentPaymentStatusAction, deleteAppointmentAction } from "@/app/actions"
+import { getTenantId } from '@/lib/session'
 
 export default async function AtendimentosPage() {
+  const tenantId = await getTenantId();
   const appointments = await prisma.appointment.findMany({
+    where: { tenantId },
     include: {
       customer: true,
       barber: true,

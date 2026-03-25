@@ -6,11 +6,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { prisma } from "@/lib/prisma"
 import { createBlockedTimeAction } from "@/app/actions"
+import { getTenantId } from '@/lib/session'
 
 export default async function HorariosPage() {
-  const barbers = await prisma.user.findMany({ where: { role: 'BARBER' } });
-  
+  const tenantId = await getTenantId();
+  const barbers = await prisma.user.findMany({ where: { role: 'BARBER', tenantId } });
+
   const blockedTimes = await prisma.blockedTime.findMany({
+    where: { tenantId },
     include: { barber: true },
     orderBy: { startTime: 'asc' }
   });

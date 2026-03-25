@@ -7,9 +7,12 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label"
 import { prisma } from "@/lib/prisma"
 import { createProductAction } from "@/app/actions"
+import { getTenantId } from '@/lib/session'
 
 export default async function ProdutosPage() {
+  const tenantId = await getTenantId();
   const products = await prisma.product.findMany({
+    where: { tenantId },
     orderBy: { stock: 'asc' }
   });
 
