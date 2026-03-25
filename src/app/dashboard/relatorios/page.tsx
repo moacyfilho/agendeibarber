@@ -2,11 +2,11 @@ import { prisma } from "@/lib/prisma";
 import { Star, TrendingUp, Users, AlertTriangle, Clock, ChevronRight, Gift } from "lucide-react";
 import { format, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { getTenantId } from '@/lib/session'
 
-async function getRetentionData() {
-  const tenant = await prisma.tenant.findFirst();
+async function getRetentionData(tenantId: string) {
+  const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
   if (!tenant) return null;
-  const tenantId = tenant.id;
 
   // Clientes inativos há mais de 30 dias
   const thirtyDaysAgo = subDays(new Date(), 30);
@@ -92,7 +92,8 @@ async function getRetentionData() {
 const formatPrice = (cents: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cents / 100);
 
 export default async function RelatoriosPage() {
-  const data = await getRetentionData();
+  const tenantId = await getTenantId();
+  const data = await getRetentionData(tenantId);
   if (!data) return <div className="text-white p-10">Nenhum dado encontrado.</div>;
 
   return (
