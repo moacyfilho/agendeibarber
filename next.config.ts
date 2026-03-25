@@ -2,9 +2,20 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   typescript: {
-    // O Prisma Client em produção tem os tipos corretos após `prisma generate`
-    // Desabilitar aqui enquanto o ambiente local e o de deploy divergem
     ignoreBuildErrors: true,
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/:slug/painel/:path*',
+        destination: '/dashboard/:path*',
+      },
+      // Permite também /:slug/dashboard para flexibilidade
+      {
+        source: '/:slug/dashboard/:path*',
+        destination: '/dashboard/:path*',
+      },
+    ]
   },
 };
 
