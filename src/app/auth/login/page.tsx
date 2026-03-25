@@ -26,12 +26,11 @@ export default async function LoginPage() {
                try {
                  await signIn("credentials", {
                    email: formData.get("email"),
-                   password: "demo", // Mock para protótipo. Real usaria passwordHash
+                   password: formData.get("password"),
                    redirect: true,
                    redirectTo: "/dashboard"
                  })
                } catch (error) {
-                 // NextAuth redirects by throwing an error, so we should allow it
                  throw error;
                }
              }}
@@ -83,10 +82,8 @@ export default async function LoginPage() {
            </div>
         </div>
 
-        <div className="mt-10 flex items-center justify-center gap-6">
-           <img src="/stripe-badge.svg" alt="Payments" className="opacity-20 grayscale" />
-           <div className="h-4 w-px bg-zinc-800"></div>
-           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-800">Power by Agendei Barber</p>
+        <div className="mt-10 flex items-center justify-center">
+           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-800">Powered by Agendei Barber</p>
         </div>
       </div>
     </div>
