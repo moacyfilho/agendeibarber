@@ -1,6 +1,7 @@
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import { prisma } from "@/lib/prisma"
+import bcrypt from "bcryptjs"
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -10,17 +11,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: "Senha", type: "password" },
       },
       async authorize(credentials) {
-        // Num app real, usaríamos bcrypt para checar passwordHash
-        // Para este MVP/PROTÓTIPO, vamos permitir login com email de barbeiro ou owner cadastrado
+        if (!credentials?.email || !credentials?.password) return null;
+
         const user = await prisma.user.findFirst({
-          where: { 
-            email: credentials?.email as string,
+          where: {
+            email: credentials.email as string,
             role: { in: ["OWNER", "BARBER"] }
           },
           include: { tenant: true }
-        })
+        });
 
-        if (!user) return null
+        if (!user || !user.passwordHash) return null;
+
+        const passwordValid = await bcrypt.compare(
+          credentials.password as string,
+          user.passwordHash
+        );
+
+        if (!passwordValid) return null;
 
         return {
           id: user.id,
@@ -29,7 +37,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           role: user.role,
           tenantId: user.tenantId,
           tenantSlug: user.tenant.slug
-        }
+        };
       },
     }),
   ],
