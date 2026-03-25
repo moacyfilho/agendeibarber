@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Phone, Scissors, Loader2, CheckCircle2, User, ArrowRight } from "lucide-react";
-import { checkCustomerByPhoneAction } from "@/app/actions";
+import { checkCustomerByPhoneAction, registerCustomerAction } from "@/app/actions";
 import { BookingCalendar } from "@/components/BookingCalendar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,8 +33,10 @@ export function CustomerEntryFlow({ barbers, services, tenantId, tenantName }: {
     }
   };
 
-  const handleFinishIdentification = () => {
+  const handleFinishIdentification = async () => {
     if (!customerName || !customerPhone) return;
+    // Salva no banco se for cliente novo (se já existir, a action ignora silenciosamente)
+    await registerCustomerAction(customerName, customerPhone, tenantId);
     setIdentifiedCustomer({ name: customerName, phone: customerPhone });
     setShowModal(false);
   };

@@ -339,6 +339,29 @@ export async function checkCustomerByPhoneAction(phone: string, tenantId: string
   return customer;
 }
 
+export async function registerCustomerAction(name: string, phone: string, tenantId: string) {
+  if (!name || !phone || !tenantId) return { error: 'Dados incompletos' };
+
+  // Se já existe, apenas retorna (não duplica)
+  const existing = await prisma.user.findFirst({
+    where: { phone, role: 'CUSTOMER', tenantId }
+  });
+  if (existing) return { success: true, name: existing.name };
+
+  await prisma.user.create({
+    data: {
+      name,
+      phone,
+      email: `cliente_${Date.now()}_${phone.replace(/\D/g, '')}@agendei.app`,
+      role: 'CUSTOMER',
+      tenantId,
+    }
+  });
+
+  revalidatePath('/dashboard/clientes');
+  return { success: true, name };
+}
+
 export async function getAvailableTimesAction(barberId: string, dateIsoString: string, durationMinutes: number) {
   const date = new Date(dateIsoString);
   const startOfDay = new Date(date);
