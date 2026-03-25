@@ -25,16 +25,17 @@ model Tenant {
   openingHours  String?        @default("09:00-20:00")
   workingDays   String?        @default("1,2,3,4,5,6") // 0=Dom, 6=Sab
 
-  subscriptions Subscription[]
-  users         User[]
-  services      Service[]
-  appointments  Appointment[]
-  blockedTimes  BlockedTime[]
-  products      Product[]
-  sales         Sale[]
-  reviews       Review[]
-  loyaltyCards  LoyaltyCard[]
-  notifications NotificationLog[]
+  subscriptions     Subscription[]
+  users             User[]
+  services          Service[]
+  appointments      Appointment[]
+  blockedTimes      BlockedTime[]
+  products          Product[]
+  sales             Sale[]
+  reviews           Review[]
+  loyaltyCards      LoyaltyCard[]
+  notifications     NotificationLog[]
+  membershipPlans   MembershipPlan[]
 
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @default(now())
@@ -229,6 +230,24 @@ model LoyaltyCard {
   updatedAt     DateTime @default(now())
 
   @@unique([tenantId, customerId])
+}
+
+// 💳 Planos de Assinatura da Barbearia (para clientes)
+model MembershipPlan {
+  id              String   @id @default(uuid())
+  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenantId        String
+
+  name            String
+  description     String?
+  priceInCents    Int
+  billingCycle    String   @default("MENSAL") // MENSAL, TRIMESTRAL, ANUAL
+  serviceNames    String   @default("") // nomes dos serviços incluídos (separados por vírgula)
+  isActive        Boolean  @default(true)
+  activeCount     Int      @default(0) // cache do nº de assinantes ativos
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now())
 }
 
 // 📱 Log de Notificações (WhatsApp / SMS / Push)

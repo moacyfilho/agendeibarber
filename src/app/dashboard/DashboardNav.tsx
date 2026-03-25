@@ -112,10 +112,14 @@ export function DashboardNav() {
       <NavItem href="/dashboard/fechamento-diario" icon={Calculator} label="Fechamento Diário" />
       <NavItem href="/dashboard/fechamento-mensal" icon={Scale}      label="Balanço Mensal" />
 
+      <SectionDivider label="Assinaturas" />
+
+      <NavItem href="/dashboard/planos"       icon={CreditCard}  label="Planos p/ Clientes" badge="novo" />
+      <NavItem href="/dashboard/assinaturas"  icon={CreditCard}  label="Minha Assinatura" />
+
       <SectionDivider label="Configurações" />
 
-      <NavItem href="/dashboard/assinaturas"  icon={CreditCard}  label="Assinatura" />
-      <NavItem href="/dashboard/configuracoes"    icon={Palette}    label="Personalizar" badge="novo" />
+      <NavItem href="/dashboard/configuracoes" icon={Palette} label="Personalizar" />
 
     </nav>
   );
