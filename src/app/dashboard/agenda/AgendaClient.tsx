@@ -1,13 +1,12 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Plus, X, Loader2, Search, Lock, CheckCircle2, Clock, User } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, X, Loader2, Search, Lock, CheckCircle2 } from 'lucide-react';
 import { format, addDays, subDays, startOfWeek, addWeeks, subWeeks, isSameDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { createPortal } from 'react-dom';
 import {
   createAppointmentAction,
-  getAvailableTimesAction,
   checkCustomerByPhoneAction,
   createBlockedTimeAction,
 } from '@/app/actions';
@@ -33,11 +32,6 @@ function timeSlots() {
   return slots;
 }
 
-function slotToMinutes(slot: string) {
-  const [h, m] = slot.split(':').map(Number);
-  return h * 60 + m;
-}
-
 function minutesToY(minutes: number) {
   const offset = minutes - START_HOUR * 60;
   return (offset / 30) * SLOT_HEIGHT;
@@ -53,7 +47,7 @@ type Appointment = {
   barber: { id: string; name: string };
 };
 
-type Barber = { id: string; name: string; image: string | null };
+type Barber = { id: string; name: string; avatarUrl: string | null };
 type Service = { id: string; name: string; durationMinutes: number; priceInCents: number };
 
 interface Props {
@@ -61,26 +55,33 @@ interface Props {
   services: Service[];
   initialAppointments: Appointment[];
   tenantId: string;
+  todayIso: string; // ISO date string from server to avoid hydration mismatch
 }
 
-export function AgendaClient({ barbers, services, initialAppointments, tenantId }: Props) {
+export function AgendaClient({ barbers, services, initialAppointments, tenantId, todayIso }: Props) {
   const [viewMode, setViewMode] = useState<'day' | 'week'>('day');
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [appointments, setAppointments] = useState<Appointment[]>(initialAppointments);
+  // Inicializado com a data do servidor para evitar hydration mismatch
+  const [currentDate, setCurrentDate] = useState(() => new Date(todayIso));
+  const appointments = initialAppointments;
   const [filterBarber, setFilterBarber] = useState<string>('all');
   const [search, setSearch] = useState('');
   const [modal, setModal] = useState<{ barberId: string; date: Date; time: string } | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [nowY, setNowY] = useState<number | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to current time on mount
   useEffect(() => {
-    const now = new Date();
-    const minutes = now.getHours() * 60 + now.getMinutes();
-    const y = minutesToY(minutes);
+    function updateNow() {
+      const n = new Date();
+      setNowY(minutesToY(n.getHours() * 60 + n.getMinutes()));
+    }
+    updateNow();
+    const timer = setInterval(updateNow, 60000);
+
+    const y = minutesToY(new Date().getHours() * 60 + new Date().getMinutes());
     if (scrollRef.current) {
       scrollRef.current.scrollTop = Math.max(0, y - 120);
     }
+    return () => clearInterval(timer);
   }, []);
 
   const slots = timeSlots();
@@ -121,23 +122,12 @@ export function AgendaClient({ barbers, services, initialAppointments, tenantId 
     setModal({ barberId, date, time: slot });
   }
 
-  async function refreshAppointments(date: Date) {
-    const start = new Date(date);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(date);
-    end.setHours(23, 59, 59, 999);
-    // Recarrega com window.location para simplificar (server fetch)
-    window.location.reload();
-  }
-
   const dateLabel = viewMode === 'day'
     ? format(currentDate, "d 'de' MMMM", { locale: ptBR })
     : `${format(weekDays[0], 'd MMM', { locale: ptBR })} – ${format(weekDays[6], 'd MMM', { locale: ptBR })}`;
 
-  const now = new Date();
-  const nowMinutes = now.getHours() * 60 + now.getMinutes();
-  const nowY = minutesToY(nowMinutes);
-  const isToday = (d: Date) => isSameDay(d, new Date());
+  const todayStr = todayIso.slice(0, 10);
+  const isToday = (d: Date) => format(d, 'yyyy-MM-dd') === todayStr;
 
   return (
     <div className="flex flex-col h-full">
@@ -217,7 +207,7 @@ export function AgendaClient({ barbers, services, initialAppointments, tenantId 
             <div key={b.id} className="flex items-center gap-1.5">
               <span className={`w-2.5 h-2.5 rounded-full ${color.dot}`} />
               <div className={`w-6 h-6 rounded-full ${color.bg} border ${color.border} flex items-center justify-center text-[9px] font-black ${color.text} overflow-hidden`}>
-                {b.image ? <img src={b.image} alt={b.name} className="w-full h-full object-cover rounded-full" /> : b.name[0]}
+                {b.avatarUrl ? <img src={b.avatarUrl} alt={b.name} className="w-full h-full object-cover rounded-full" /> : b.name[0]}
               </div>
               <span className="text-xs text-zinc-400 font-medium">{b.name}</span>
             </div>
@@ -236,7 +226,7 @@ export function AgendaClient({ barbers, services, initialAppointments, tenantId 
                 return (
                   <div key={barber.id} className={`flex-1 min-w-0 border-r border-zinc-900 last:border-r-0 px-3 py-3 flex flex-col items-center gap-2 ${color.bg}`}>
                     <div className={`w-10 h-10 rounded-full ${color.bg} border-2 ${color.border} flex items-center justify-center text-sm font-black ${color.text} overflow-hidden`}>
-                      {barber.image ? <img src={barber.image} alt={barber.name} className="w-full h-full object-cover" /> : barber.name[0]}
+                      {barber.avatarUrl ? <img src={barber.avatarUrl} alt={barber.name} className="w-full h-full object-cover" /> : barber.name[0]}
                     </div>
                     <span className={`text-xs font-bold ${color.text}`}>{barber.name}</span>
                     <button
@@ -299,8 +289,7 @@ export function AgendaClient({ barbers, services, initialAppointments, tenantId 
                     />
                   );
                 })
-              : displayedDays.map((day, di) => {
-                  // semana: uma coluna por dia, todos barbeiros empilhados
+              : displayedDays.map((day) => {
                   const dayApps = visibleBarbers.flatMap(b => getAppointmentsFor(b.id, day)).filter(matchesSearch);
                   return (
                     <WeekColumn
@@ -338,7 +327,15 @@ export function AgendaClient({ barbers, services, initialAppointments, tenantId 
 }
 
 /* ── Coluna dia/barbeiro ── */
-function BarberColumn({ barber, color, slots, slotHeight, appointments, date, isToday, nowY, onCellClick }: any) {
+function BarberColumn({ color, slots, slotHeight, appointments, isToday: _isToday, nowY, onCellClick }: {
+  color: typeof BARBER_COLORS[0];
+  slots: string[];
+  slotHeight: number;
+  appointments: Appointment[];
+  isToday: boolean;
+  nowY: number | null;
+  onCellClick: (slot: string) => void;
+}) {
   return (
     <div className={`flex-1 min-w-0 border-r border-zinc-900 last:border-r-0 relative`}>
       {/* Linhas dos slots */}
@@ -391,7 +388,16 @@ function BarberColumn({ barber, color, slots, slotHeight, appointments, date, is
 }
 
 /* ── Coluna semana ── */
-function WeekColumn({ barbers, slots, slotHeight, appointments, date, isToday, nowY, colors, onCellClick }: any) {
+function WeekColumn({ barbers, slots, slotHeight, appointments, isToday, nowY, colors, onCellClick }: {
+  barbers: Barber[];
+  slots: string[];
+  slotHeight: number;
+  appointments: Appointment[];
+  isToday: boolean;
+  nowY: number | null;
+  colors: typeof BARBER_COLORS;
+  onCellClick: (slot: string) => void;
+}) {
   return (
     <div className={`flex-1 min-w-0 border-r border-zinc-900 last:border-r-0 relative ${isToday ? 'bg-orange-500/[0.02]' : ''}`}>
       {slots.map((slot: string, idx: number) => (
