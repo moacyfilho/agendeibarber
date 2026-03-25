@@ -59,9 +59,9 @@ interface Props {
 }
 
 export function AgendaClient({ barbers, services, initialAppointments, tenantId, todayIso }: Props) {
+  const [mounted, setMounted] = useState(false);
   const [viewMode, setViewMode] = useState<'day' | 'week'>('day');
-  // Inicializado com a data do servidor para evitar hydration mismatch
-  const [currentDate, setCurrentDate] = useState(() => new Date(todayIso));
+  const [currentDate, setCurrentDate] = useState<Date | null>(null);
   const appointments = initialAppointments;
   const [filterBarber, setFilterBarber] = useState<string>('all');
   const [search, setSearch] = useState('');
@@ -70,6 +70,11 @@ export function AgendaClient({ barbers, services, initialAppointments, tenantId,
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Toda lógica de data só roda no cliente — evita hydration mismatch
+    const today = new Date();
+    setCurrentDate(today);
+    setMounted(true);
+
     function updateNow() {
       const n = new Date();
       setNowY(minutesToY(n.getHours() * 60 + n.getMinutes()));
@@ -77,12 +82,23 @@ export function AgendaClient({ barbers, services, initialAppointments, tenantId,
     updateNow();
     const timer = setInterval(updateNow, 60000);
 
-    const y = minutesToY(new Date().getHours() * 60 + new Date().getMinutes());
+    const y = minutesToY(today.getHours() * 60 + today.getMinutes());
     if (scrollRef.current) {
       scrollRef.current.scrollTop = Math.max(0, y - 120);
     }
     return () => clearInterval(timer);
   }, []);
+
+  // Skeleton enquanto não montou no cliente
+  if (!mounted || !currentDate) {
+    return (
+      <div className="flex flex-col gap-4 animate-pulse">
+        <div className="h-10 bg-zinc-900 rounded-xl w-2/3" />
+        <div className="h-8 bg-zinc-900 rounded-xl w-1/3" />
+        <div className="flex-1 h-[600px] bg-zinc-900 rounded-2xl" />
+      </div>
+    );
+  }
 
   const slots = timeSlots();
 
