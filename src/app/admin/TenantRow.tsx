@@ -8,9 +8,9 @@ import { useState } from "react";
 import { EditTenantModal } from "./EditTenantModal";
 
 const PLANS = [
-  { value: 'FREE', label: 'Free', color: 'text-zinc-400 border-zinc-700 bg-zinc-900' },
-  { value: 'STARTER', label: 'Starter R$49,90', color: 'text-orange-400 border-orange-500/30 bg-orange-500/10' },
-  { value: 'ENTERPRISE', label: 'Enterprise', color: 'text-purple-400 border-purple-500/30 bg-purple-500/10' },
+  { value: 'STARTER', label: 'Starter R$49,90', color: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10' },
+  { value: 'PROFISSIONAL', label: 'Profissional R$99,90', color: 'text-orange-400 border-orange-500/30 bg-orange-500/10' },
+  { value: 'PREMIUM', label: 'Premium R$149,90', color: 'text-purple-400 border-purple-500/30 bg-purple-500/10' },
 ];
 
 export function TenantRow({ t }: { t: any }) {
@@ -89,25 +89,46 @@ export function TenantRow({ t }: { t: any }) {
               </span>
             )}
           </div>
-          <a
-            href={`/${t.slug}`}
-            target="_blank"
-            className="text-[11px] font-medium text-zinc-600 flex items-center gap-1.5 mt-1 hover:text-emerald-400 transition-colors group/link"
-          >
-            /{t.slug}
-            <ExternalLink className="w-2.5 h-2.5 opacity-0 group-hover/link:opacity-100 transition-opacity" />
-          </a>
+          <div className="flex flex-col gap-1.5 mt-2">
+            <a
+              href={`/${t.slug}`}
+              target="_blank"
+              className="group/link flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-zinc-900/30 border border-zinc-900 hover:border-emerald-500/20 hover:bg-emerald-500/5 transition-all w-fit"
+            >
+              <div className="w-5 h-5 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center group-hover/link:border-emerald-500/30">
+                <ExternalLink className="w-2.5 h-2.5 text-zinc-600 group-hover/link:text-emerald-400" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[9px] font-black text-zinc-700 uppercase leading-none mb-0.5">Agendamento</span>
+                <span className="text-[11px] font-bold text-zinc-400 group-hover/link:text-emerald-400 tracking-tight transition-colors">/{t.slug}</span>
+              </div>
+            </a>
+
+            <a
+              href={`/${t.slug}/painel`}
+              target="_blank"
+              className="group/link flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-zinc-900/30 border border-zinc-900 hover:border-orange-500/20 hover:bg-orange-500/5 transition-all w-fit"
+            >
+              <div className="w-5 h-5 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center group-hover/link:border-orange-500/30">
+                <Briefcase className="w-2.5 h-2.5 text-zinc-600 group-hover/link:text-orange-400" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[9px] font-black text-zinc-700 uppercase leading-none mb-0.5">Painel Admin</span>
+                <span className="text-[11px] font-bold text-zinc-400 group-hover/link:text-orange-400 tracking-tight transition-colors">/{t.slug}/painel</span>
+              </div>
+            </a>
+          </div>
 
           {/* Stats mini-bar */}
-          <div className="flex items-center gap-3 mt-2.5">
-            <span className="flex items-center gap-1 text-[10px] font-medium text-zinc-600">
-              <Users className="w-2.5 h-2.5" /> {userCount}
+          <div className="flex items-center gap-3 mt-4">
+            <span className="flex items-center gap-1.5 text-[10px] font-bold text-zinc-600">
+              <Users className="w-3 h-3 opacity-50" /> {userCount} <span className="text-[9px] opacity-40 font-medium">users</span>
             </span>
-            <span className="flex items-center gap-1 text-[10px] font-medium text-zinc-600">
-              <Briefcase className="w-2.5 h-2.5" /> {serviceCount}
+            <span className="flex items-center gap-1.5 text-[10px] font-bold text-zinc-600">
+              <Briefcase className="w-3 h-3 opacity-50" /> {serviceCount} <span className="text-[9px] opacity-40 font-medium">serviços</span>
             </span>
-            <span className="flex items-center gap-1 text-[10px] font-medium text-zinc-600">
-              <Calendar className="w-2.5 h-2.5" /> {appointmentCount}
+            <span className="flex items-center gap-1.5 text-[10px] font-bold text-zinc-600">
+              <Calendar className="w-3 h-3 opacity-50" /> {appointmentCount} <span className="text-[9px] opacity-40 font-medium">slots</span>
             </span>
           </div>
         </div>
