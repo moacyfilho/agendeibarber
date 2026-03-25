@@ -1,4 +1,3 @@
-'use server';
 import { prisma } from '@/lib/prisma';
 import { getTenantId } from '@/lib/session';
 import { PlanosList } from './PlanosList';
