@@ -1,14 +1,7 @@
-import { BookingCalendar } from "@/components/BookingCalendar";
-import { prisma } from "@/lib/prisma";
-
-export const dynamic = 'force-dynamic'
-import { Scissors, Calendar, ShieldCheck, Zap, ArrowRight, Star, ChevronRight } from "lucide-react";
+import { Scissors, Calendar, ShieldCheck, Zap, ArrowRight, Star, BarChart2, Users, Smartphone } from "lucide-react";
 import Link from "next/link";
 
-export default async function Home() {
-  const barbers = await prisma.user.findMany({ where: { role: 'BARBER' } });
-  const services = await prisma.service.findMany({ where: { isActive: true } });
-
+export default function Home() {
   return (
     <main className="min-h-screen bg-[#050505] text-white selection:bg-orange-500/25">
 
@@ -21,10 +14,10 @@ export default async function Home() {
             </div>
             <span className="text-lg font-black tracking-tight uppercase italic text-white">Agendei Barber</span>
           </div>
-          <div className="flex items-center gap-2 md:gap-6">
+          <div className="flex items-center gap-3">
             <div className="hidden md:flex items-center gap-6 text-xs font-bold text-zinc-500 uppercase tracking-widest">
-              <Link href="#agendar" className="hover:text-white transition-colors">Agendamento</Link>
-              <Link href="#servicos" className="hover:text-white transition-colors">Serviços</Link>
+              <a href="#funcionalidades" className="hover:text-white transition-colors">Funcionalidades</a>
+              <a href="#planos" className="hover:text-white transition-colors">Planos</a>
             </div>
             <Link
               href="/dashboard"
@@ -38,41 +31,34 @@ export default async function Home() {
 
       {/* ─── HERO ────────────────────────────────────────────── */}
       <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-16">
-        {/* Background */}
         <div className="absolute inset-0 z-0">
-          <img
-            src="/barber_hero_bg_1774376474349.png"
-            alt="Agendei Barber Interior"
-            className="w-full h-full object-cover opacity-30 scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/50 to-[#050505]/80" />
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-950/20 via-[#050505] to-[#050505]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] max-w-4xl bg-orange-500/4 blur-[140px] rounded-full pointer-events-none" />
         </div>
-        {/* Ambient */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[70vw] h-[40vh] bg-orange-500/6 blur-[120px] rounded-full pointer-events-none" />
 
         <div className="relative z-10 text-center px-6 max-w-5xl">
           <div className="inline-flex items-center gap-2 bg-orange-500/8 border border-orange-500/15 px-4 py-2 rounded-full text-orange-400 text-[10px] font-black uppercase tracking-[0.25em] mb-8">
-            <Zap className="w-3.5 h-3.5" /> A Experiência Definitiva em Barbearia
+            <Zap className="w-3.5 h-3.5" /> Plataforma SaaS para Barbearias
           </div>
 
           <h1 className="text-6xl md:text-[88px] font-black tracking-tighter mb-6 leading-[0.9]">
-            Corte com Estilo,{' '}
+            Sua Barbearia,{' '}
             <br className="hidden md:block" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-500">
-              Agende com Classe.
+              No Digital.
             </span>
           </h1>
 
           <p className="text-zinc-500 text-base md:text-lg font-medium max-w-xl mx-auto mb-10 leading-relaxed">
-            Conectamos você aos mestres da tesoura em uma plataforma premium de agendamento em tempo real.
+            Agenda online, gestão de barbeiros, caixa, comissões e fidelidade — tudo em um único painel profissional.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
             <Link
-              href="#agendar"
+              href="/dashboard"
               className="bg-orange-500 hover:bg-orange-600 active:scale-95 px-8 py-4 rounded-2xl font-black text-base flex items-center gap-2.5 transition-all shadow-[0_4px_24px_rgba(249,115,22,0.3)] group"
             >
-              RESERVAR AGORA
+              ACESSAR PAINEL
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </Link>
 
@@ -83,7 +69,7 @@ export default async function Home() {
                     key={i}
                     className="w-7 h-7 rounded-full border-2 border-[#050505] bg-zinc-700 flex items-center justify-center text-[9px] font-bold text-zinc-400"
                   >
-                    U{i}
+                    B{i}
                   </div>
                 ))}
               </div>
@@ -99,7 +85,6 @@ export default async function Home() {
           </div>
         </div>
 
-        {/* Scroll hint */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce opacity-40">
           <div className="w-5 h-8 border border-zinc-700 rounded-full flex justify-center pt-1.5">
             <div className="w-0.5 h-1.5 bg-orange-500 rounded-full" />
@@ -107,64 +92,79 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ─── BOOKING ─────────────────────────────────────────── */}
-      <section id="agendar" className="py-28 px-6 relative">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60vw] h-[60vw] max-w-3xl bg-orange-500/4 blur-[140px] rounded-full pointer-events-none" />
-
-        <div className="max-w-7xl mx-auto text-center mb-16 relative z-10">
-          <span className="inline-block text-[10px] font-black text-orange-400 uppercase tracking-[0.25em] bg-orange-500/8 border border-orange-500/15 px-4 py-1.5 rounded-full mb-5">
-            Agendamento
-          </span>
-          <h2 className="text-4xl md:text-5xl font-black tracking-tighter mb-3 uppercase italic">
-            Escolha sua Experiência
-          </h2>
-          <p className="text-zinc-600 font-bold uppercase tracking-widest text-[10px]">
-            Selecione o serviço e o profissional abaixo
-          </p>
-        </div>
-
-        <div className="max-w-5xl mx-auto relative z-10">
-          <div className="bg-zinc-950/60 backdrop-blur-2xl border border-zinc-900/80 p-8 md:p-12 rounded-[2.5rem] shadow-[0_0_80px_rgba(0,0,0,0.6)] relative overflow-hidden">
-            <div className="absolute -top-20 -right-20 w-40 h-40 bg-orange-500/8 blur-[60px] rounded-full" />
-            <BookingCalendar barbers={barbers} services={services} />
-          </div>
-        </div>
-      </section>
-
-      {/* ─── FEATURES ────────────────────────────────────────── */}
-      <section id="servicos" className="py-28 border-t border-zinc-900/60">
-        <div className="max-w-7xl mx-auto px-6">
+      {/* ─── FUNCIONALIDADES ─────────────────────────────────── */}
+      <section id="funcionalidades" className="py-28 border-t border-zinc-900/60 px-6">
+        <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-black tracking-tighter mb-3">Por que escolher a gente?</h2>
-            <p className="text-zinc-600 text-sm font-medium max-w-xs mx-auto">A plataforma que une tecnologia e tradição</p>
+            <span className="inline-block text-[10px] font-black text-orange-400 uppercase tracking-[0.25em] bg-orange-500/8 border border-orange-500/15 px-4 py-1.5 rounded-full mb-5">
+              Tudo que sua barbearia precisa
+            </span>
+            <h2 className="text-4xl md:text-5xl font-black tracking-tighter mb-3">Funcionalidades</h2>
+            <p className="text-zinc-600 text-sm font-medium max-w-sm mx-auto">Uma plataforma completa para profissionalizar sua gestão</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               {
                 icon: Calendar,
-                title: 'Agendamento Real',
-                desc: 'Veja a disponibilidade imediata e reserve sem ligações ou esperas desnecessárias.',
+                title: 'Agenda Online',
+                desc: 'Seus clientes agendam pelo link da sua barbearia, 24h por dia, sem precisar ligar.',
+              },
+              {
+                icon: Users,
+                title: 'Gestão de Barbeiros',
+                desc: 'Cadastre barbeiros, defina comissões, bloqueie horários e acompanhe a performance.',
+              },
+              {
+                icon: BarChart2,
+                title: 'Caixa & Relatórios',
+                desc: 'Controle entradas, saídas, fechamento diário/mensal e comissões automaticamente.',
               },
               {
                 icon: ShieldCheck,
-                title: 'Garantia SaaS',
-                desc: 'Dados protegidos, confirmação automática e histórico completo dos seus atendimentos.',
+                title: 'Fidelidade Digital',
+                desc: 'Programa de pontos automático — a cada X cortes, o cliente ganha uma recompensa.',
+              },
+              {
+                icon: Smartphone,
+                title: 'Página Própria',
+                desc: 'Cada barbearia tem uma URL exclusiva com seus serviços, barbeiros e calendário.',
               },
               {
                 icon: Scissors,
-                title: 'Mestres do Corte',
-                desc: 'Trabalhamos apenas com as barbearias de elite e profissionais altamente qualificados.',
+                title: 'PDV Integrado',
+                desc: 'Registre vendas de produtos, serviços avulsos e assinaturas em um único ponto.',
               },
             ].map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="group p-8 bg-zinc-900/30 border border-zinc-900/60 rounded-3xl hover:border-zinc-800 hover:bg-zinc-900/50 transition-all text-center">
-                <div className="w-14 h-14 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mx-auto text-orange-500 mb-6 group-hover:border-orange-500/20 group-hover:bg-orange-500/5 transition-all">
-                  <Icon className="w-6 h-6" />
+              <div key={title} className="group p-7 bg-zinc-900/30 border border-zinc-900/60 rounded-3xl hover:border-zinc-800 hover:bg-zinc-900/50 transition-all">
+                <div className="w-12 h-12 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center text-orange-500 mb-5 group-hover:border-orange-500/20 group-hover:bg-orange-500/5 transition-all">
+                  <Icon className="w-5 h-5" />
                 </div>
-                <h3 className="text-base font-black uppercase tracking-widest italic mb-3">{title}</h3>
+                <h3 className="text-sm font-black uppercase tracking-widest italic mb-2">{title}</h3>
                 <p className="text-zinc-500 text-sm font-medium leading-relaxed">{desc}</p>
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ─── CTA ─────────────────────────────────────────────── */}
+      <section id="planos" className="py-28 px-6 relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-orange-950/10 to-transparent pointer-events-none" />
+        <div className="max-w-3xl mx-auto text-center relative z-10">
+          <h2 className="text-4xl md:text-5xl font-black tracking-tighter mb-5">
+            Pronto para digitalizar<br />sua barbearia?
+          </h2>
+          <p className="text-zinc-500 text-base font-medium mb-10 leading-relaxed max-w-md mx-auto">
+            Acesse o painel, configure sua barbearia em minutos e compartilhe o link com seus clientes.
+          </p>
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-2.5 bg-orange-500 hover:bg-orange-600 active:scale-95 px-10 py-4 rounded-2xl font-black text-base transition-all shadow-[0_4px_32px_rgba(249,115,22,0.3)] group"
+          >
+            COMEÇAR AGORA
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
         </div>
       </section>
 
