@@ -12,6 +12,11 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/auth/login", nextUrl))
   }
 
+  // Qualquer /[slug]/painel → redireciona para /dashboard (requer login)
+  if (nextUrl.pathname.endsWith("/painel") && !isLogged) {
+    return NextResponse.redirect(new URL("/auth/login", nextUrl))
+  }
+
   // Redirecionar login para dashboard quando já logado
   if (nextUrl.pathname === "/auth/login" && isLogged) {
     return NextResponse.redirect(new URL("/dashboard", nextUrl))
@@ -21,5 +26,5 @@ export default auth((req) => {
 })
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/auth/login", "/admin/:path*", "/admin"],
+  matcher: ["/dashboard/:path*", "/auth/login", "/admin/:path*", "/admin", "/:slug/painel"],
 }
