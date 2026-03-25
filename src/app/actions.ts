@@ -563,3 +563,69 @@ export async function createStripeCheckoutSessionAction() {
   const { redirect } = await import('next/navigation');
   redirect(session.url);
 }
+
+// ─── Clientes ────────────────────────────────────────────────────────────────
+
+export async function updateClienteAction(id: string, formData: FormData) {
+  const tenantId = await getTenantContext();
+  const name = formData.get('name') as string;
+  const phone = formData.get('phone') as string;
+  if (!name) return { error: 'Nome é obrigatório.' };
+  await prisma.user.updateMany({ where: { id, tenantId, role: 'CUSTOMER' }, data: { name, phone } });
+  revalidatePath('/dashboard/clientes');
+  return { success: true };
+}
+
+export async function deleteClienteAction(id: string) {
+  const tenantId = await getTenantContext();
+  await prisma.user.deleteMany({ where: { id, tenantId, role: 'CUSTOMER' } });
+  revalidatePath('/dashboard/clientes');
+  return { success: true };
+}
+
+// ─── Serviços ─────────────────────────────────────────────────────────────────
+
+export async function updateServicoAction(id: string, formData: FormData) {
+  const tenantId = await getTenantContext();
+  const name = formData.get('sname') as string;
+  const time = formData.get('stime') as string;
+  const price = formData.get('sprice') as string;
+  if (!name) return { error: 'Nome é obrigatório.' };
+  const numTime = parseInt(time) || 30;
+  const priceClean = parseInt(price?.replace(/\D/g, '') || '0');
+  await prisma.service.updateMany({ where: { id, tenantId }, data: { name, durationMinutes: numTime, priceInCents: priceClean } });
+  revalidatePath('/dashboard/servicos');
+  return { success: true };
+}
+
+export async function deleteServicoAction(id: string) {
+  const tenantId = await getTenantContext();
+  await prisma.service.deleteMany({ where: { id, tenantId } });
+  revalidatePath('/dashboard/servicos');
+  return { success: true };
+}
+
+// ─── Produtos ─────────────────────────────────────────────────────────────────
+
+export async function updateProductAction(id: string, formData: FormData) {
+  const tenantId = await getTenantContext();
+  const name = formData.get('name') as string;
+  const price = formData.get('price') as string;
+  const stock = formData.get('stock') as string;
+  const minStock = formData.get('minStock') as string;
+  if (!name) return { error: 'Nome é obrigatório.' };
+  const priceClean = parseInt(price?.replace(/\D/g, '') || '0');
+  await prisma.product.updateMany({
+    where: { id, tenantId },
+    data: { name, priceInCents: priceClean, stock: parseInt(stock) || 0, minStock: parseInt(minStock) || 5 }
+  });
+  revalidatePath('/dashboard/produtos');
+  return { success: true };
+}
+
+export async function deleteProductAction(id: string) {
+  const tenantId = await getTenantContext();
+  await prisma.product.deleteMany({ where: { id, tenantId } });
+  revalidatePath('/dashboard/produtos');
+  return { success: true };
+}

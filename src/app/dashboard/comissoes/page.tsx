@@ -28,9 +28,7 @@ export default async function ComissoesPage() {
 
   // Agrupa os dados
   const commissionData = barbers.map(barber => {
-    // Retira a porcentagem criada via gambiarra estrutural no `createBarbeiroAction`
-    const commissionMatch = barber.phone?.match(/(\d+)%/);
-    const commissionRate = commissionMatch ? parseInt(commissionMatch[1]) / 100 : 0.4; // 40% fallback
+    const commissionRate = (barber.commissionPercentage ?? 50) / 100;
 
     const myAppointments = paidAppointments.filter(app => app.barberId === barber.id);
     const totalRevenueCents = myAppointments.reduce((acc, curr) => acc + curr.totalPrice, 0);
