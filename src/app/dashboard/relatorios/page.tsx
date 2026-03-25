@@ -96,12 +96,16 @@ export default async function RelatoriosPage() {
   if (!data) return <div className="text-white p-10">Nenhum dado encontrado.</div>;
 
   return (
-    <div className="p-10 md:p-14 max-w-7xl">
-      <div className="mb-10">
-        <span className="text-orange-500 font-black text-xs uppercase tracking-widest">Inteligência</span>
-        <h1 className="text-4xl font-black text-white tracking-tight mt-1">Relatórios Inteligentes</h1>
-        <p className="text-zinc-500 mt-2 text-lg font-medium">Retenção, avaliações e alertas em tempo real.</p>
-      </div>
+    <div className="p-6 md:p-10 lg:p-12 max-w-7xl animate-fade-in-up">
+      <header className="mb-8 flex items-center gap-4">
+        <div className="page-header-icon">
+          <TrendingUp className="w-5 h-5" />
+        </div>
+        <div>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Relatórios</h1>
+          <p className="text-zinc-500 font-medium text-sm mt-0.5">Retenção, avaliações e alertas em tempo real</p>
+        </div>
+      </header>
 
       {/* CARDS DE MÉTRICAS RÁPIDAS */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-12">

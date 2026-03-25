@@ -1,13 +1,17 @@
 import Link from 'next/link';
+import { Package } from 'lucide-react';
+
 export default function PlanosPage() {
   return (
-    <div className="p-8 md:p-12 max-w-7xl mx-auto h-[80vh] flex flex-col items-center justify-center text-center">
-      <div className="w-20 h-20 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mx-auto mb-6 text-orange-500 shadow-xl shadow-orange-500/10">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+    <div className="p-6 md:p-10 lg:p-12 max-w-7xl mx-auto h-[80vh] flex flex-col items-center justify-center text-center animate-fade-in-up">
+      <div className="page-header-icon w-16 h-16 rounded-2xl mb-6">
+        <Package className="w-7 h-7" />
       </div>
-      <h2 className="text-4xl font-extrabold text-zinc-50 mb-4 tracking-tight">Módulo: Planos</h2>
-      <p className="text-zinc-400 font-medium text-lg max-w-md mx-auto">Esta página do painel já está mapeada na Clean Architecture. Implementações completas do CRUD iniciarão na próxima rodada.</p>
-      <Link href="/dashboard" className="mt-8 px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-xl transition-colors">Voltar para Dashboard</Link>
+      <h1 className="text-2xl md:text-3xl font-extrabold text-white mb-3 tracking-tight">Planos do App</h1>
+      <p className="text-zinc-500 font-medium text-sm max-w-sm mx-auto leading-relaxed">Este módulo está em desenvolvimento e estará disponível em breve com opções de planos personalizados para sua barbearia.</p>
+      <Link href="/dashboard" className="mt-6 px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-sm rounded-xl transition-colors border border-zinc-800 hover:border-zinc-700">
+        Voltar ao Painel
+      </Link>
     </div>
   );
 }

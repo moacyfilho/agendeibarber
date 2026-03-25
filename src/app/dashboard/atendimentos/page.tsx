@@ -18,18 +18,19 @@ export default async function AtendimentosPage() {
   });
 
   return (
-    <div className="p-8 md:p-12 max-w-7xl mx-auto min-h-screen">
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+    <div className="p-6 md:p-10 lg:p-12 max-w-7xl mx-auto min-h-screen animate-fade-in-up">
+      <header className="mb-8 flex items-center gap-4">
+        <div className="page-header-icon">
+          <Calendar className="w-5 h-5" />
+        </div>
         <div>
-          <h2 className="text-4xl font-extrabold text-zinc-50 mb-2 flex items-center gap-3">
-            <Calendar className="text-orange-500 w-10 h-10" /> Gestão de Atendimentos
-          </h2>
-          <p className="text-zinc-400 font-medium text-lg">Histórico completo de agendamentos e status da barbearia.</p>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Atendimentos</h1>
+          <p className="text-zinc-500 font-medium text-sm mt-0.5">Histórico completo de agendamentos e status</p>
         </div>
       </header>
 
       {/* Tabela de DB REAL */}
-      <div className="bg-[#0a0a0a] border border-zinc-900 rounded-[2rem] overflow-hidden shadow-2xl">
+      <div className="bg-[#0a0a0a] border border-zinc-900 rounded-2xl overflow-hidden shadow-xl">
         <Table>
           <TableHeader className="bg-zinc-900/40">
             <TableRow className="border-zinc-900 hover:bg-transparent">

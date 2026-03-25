@@ -20,18 +20,18 @@ export default async function AgendaPage() {
   const products = await prisma.product.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } });
 
   return (
-    <div className="p-8 md:p-12 max-w-7xl mx-auto min-h-screen">
-      <header className="mb-10 flex justify-between items-end">
+    <div className="p-6 md:p-10 lg:p-12 max-w-7xl mx-auto min-h-screen animate-fade-in-up">
+      <header className="mb-8 flex items-center gap-4">
+        <div className="page-header-icon">
+          <CalendarDays className="w-5 h-5" />
+        </div>
         <div>
-          <h2 className="text-4xl font-extrabold text-white mb-2 flex items-center gap-3">
-            <CalendarDays className="text-orange-500 w-10 h-10" /> 
-            Agenda Dinâmica
-          </h2>
-          <p className="text-zinc-400 font-medium text-lg text-balance max-w-2xl">Gerencie seus profissionais e realize novos agendamentos rápidos.</p>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Agenda</h1>
+          <p className="text-zinc-500 font-medium text-sm mt-0.5">Gerencie agendamentos e atenda seus clientes</p>
         </div>
       </header>
 
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-10">
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 md:gap-8">
         <div className="xl:col-span-3">
            <BookingCalendar barbers={barbers} services={services} />
         </div>

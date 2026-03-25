@@ -30,15 +30,16 @@ export default async function ConfiguracoesPage() {
   if (!tenant) return <div className="text-white p-10 text-xl">Nenhum tenant encontrado.</div>;
 
   return (
-    <div className="p-10 md:p-14 max-w-5xl">
-      <div className="mb-10">
-        <div className="flex items-center gap-3 text-orange-500 mb-2">
-          <Settings className="w-7 h-7" />
-          <span className="font-black text-xs uppercase tracking-widest">Configurações</span>
+    <div className="p-6 md:p-10 lg:p-12 max-w-5xl animate-fade-in-up">
+      <header className="mb-8 flex items-center gap-4">
+        <div className="page-header-icon">
+          <Palette className="w-5 h-5" />
         </div>
-        <h1 className="text-4xl font-black text-white tracking-tight">Personalização da Marca</h1>
-        <p className="text-zinc-500 mt-2 text-lg font-medium">Deixe a cara da sua barbearia no sistema.</p>
-      </div>
+        <div>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Personalização</h1>
+          <p className="text-zinc-500 font-medium text-sm mt-0.5">Deixe a cara da sua barbearia no sistema</p>
+        </div>
+      </header>
 
       <form action={updateBrandSettings} className="space-y-8">
         <input type="hidden" name="tenantId" value={tenant.id} />

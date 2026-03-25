@@ -9,14 +9,14 @@ export default async function PDVPage() {
   });
 
   return (
-    <div className="p-8 md:p-14 max-w-7xl mx-auto min-h-screen text-white font-[family-name:var(--font-geist-sans)]">
+    <div className="p-6 md:p-10 lg:p-12 max-w-7xl mx-auto min-h-screen text-white animate-fade-in-up">
       <header className="mb-14 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 relative z-10">
         <div className="flex-1">
-          <h2 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-zinc-500 mb-3 tracking-tighter">
+          <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
             Venda Rápida <span className="text-orange-500">(PDV)</span>
-          </h2>
-          <p className="text-zinc-500 font-medium text-lg flex items-center gap-2 max-w-2xl">
-            Painel otimizado para vendas rápidas de balcão com baixa automática no estoque e registro financeiro.
+          </h1>
+          <p className="text-zinc-500 font-medium text-sm mt-1">
+            Vendas de balcão com baixa automática no estoque
           </p>
         </div>
         
@@ -34,7 +34,7 @@ export default async function PDVPage() {
       {/* COMPONENTE INTERATIVO CLIENT-SIDE */}
       <PDVClient products={products} />
       
-      <div className="mt-20 border-t border-zinc-900 pt-10 flex flex-col items-center justify-center text-zinc-800 text-center select-none opacity-20 hover:opacity-100 transition-all">
+      <div className="mt-14 border-t border-zinc-900 pt-8 flex flex-col items-center justify-center text-zinc-800 text-center select-none opacity-10 hover:opacity-50 transition-all">
          <ShoppingCart className="w-12 h-12 mb-4" />
          <p className="text-[10px] uppercase font-black tracking-[0.4em] mb-1">Terminal de Ponto de Venda Seguro</p>
          <p className="text-[8px] font-bold">Agendei Barber - Versão 1.5.0</p>

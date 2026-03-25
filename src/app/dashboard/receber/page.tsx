@@ -2,13 +2,15 @@ import { TrendingUp, Users } from "lucide-react"
 
 export default function ReceberPage() {
   return (
-    <div className="p-8 md:p-12 max-w-7xl mx-auto min-h-screen">
-      <header className="mb-10 flex flex-col items-start gap-4">
-        <h2 className="text-4xl font-extrabold text-white mb-2 flex items-center gap-3">
-          <TrendingUp className="text-green-500 w-10 h-10" /> 
-          Contas a Receber (Fiados)
-        </h2>
-        <p className="text-zinc-400 font-medium text-lg">Controle de clientes que pagam "depois" ou faturas pendentes que exigem cobrança.</p>
+    <div className="p-6 md:p-10 lg:p-12 max-w-7xl mx-auto min-h-screen animate-fade-in-up">
+      <header className="mb-8 flex items-center gap-4">
+        <div className="page-header-icon !bg-green-500/10 !border-green-500/15 !text-green-500">
+          <TrendingUp className="w-5 h-5" />
+        </div>
+        <div>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Contas a Receber</h1>
+          <p className="text-zinc-500 font-medium text-sm mt-0.5">Fiados e faturas pendentes de clientes</p>
+        </div>
       </header>
 
       <div className="w-full flex flex-col justify-center items-center py-24 bg-[#0a0a0a] border border-zinc-900 rounded-3xl">

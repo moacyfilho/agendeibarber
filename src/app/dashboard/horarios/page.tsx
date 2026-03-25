@@ -16,13 +16,16 @@ export default async function HorariosPage() {
   });
 
   return (
-    <div className="p-8 md:p-12 max-w-7xl mx-auto min-h-screen">
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
-        <div>
-          <h2 className="text-4xl font-extrabold text-zinc-50 mb-2 flex items-center gap-3">
-            <Clock className="text-orange-500 w-10 h-10" /> Bloqueios de Agenda
-          </h2>
-          <p className="text-zinc-400 font-medium text-lg">Defina horários de almoço, férias ou licenças médicas dos profissionais.</p>
+    <div className="p-6 md:p-10 lg:p-12 max-w-7xl mx-auto min-h-screen animate-fade-in-up">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <div className="flex items-center gap-4">
+          <div className="page-header-icon">
+            <Clock className="w-5 h-5" />
+          </div>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Horários Bloqueados</h1>
+            <p className="text-zinc-500 font-medium text-sm mt-0.5">Almoços, férias e licenças dos profissionais</p>
+          </div>
         </div>
         
         <Dialog>
@@ -78,7 +81,7 @@ export default async function HorariosPage() {
       </header>
 
       {/* Tabela de DB REAL */}
-      <div className="bg-[#0a0a0a] border border-zinc-900 rounded-[2rem] overflow-hidden shadow-2xl">
+      <div className="bg-[#0a0a0a] border border-zinc-900 rounded-2xl overflow-hidden shadow-xl">
         <Table>
           <TableHeader className="bg-zinc-900/40">
             <TableRow className="border-zinc-900 hover:bg-transparent">

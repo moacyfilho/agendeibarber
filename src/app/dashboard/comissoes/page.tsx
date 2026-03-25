@@ -48,18 +48,19 @@ export default async function ComissoesPage() {
   const totalComissoesAtuais = commissionData.reduce((acc, curr) => acc + curr.commission, 0);
 
   return (
-    <div className="p-8 md:p-12 max-w-7xl mx-auto min-h-screen">
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+    <div className="p-6 md:p-10 lg:p-12 max-w-7xl mx-auto min-h-screen animate-fade-in-up">
+      <header className="mb-8 flex items-center gap-4">
+        <div className="page-header-icon">
+          <Percent className="w-5 h-5" />
+        </div>
         <div>
-          <h2 className="text-4xl font-extrabold text-zinc-50 mb-2 flex items-center gap-3">
-            <Percent className="text-orange-500 w-10 h-10" /> Fechamento de Comissões
-          </h2>
-          <p className="text-zinc-400 font-medium text-lg">Distribuição automática de valores para os profissionais.</p>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Comissões</h1>
+          <p className="text-zinc-500 font-medium text-sm mt-0.5">Distribuição automática de valores por profissional</p>
         </div>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-        <div className="bg-[#0a0a0a] border border-zinc-900 rounded-[2rem] p-8 shadow-2xl relative">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-10">
+        <div className="metric-card bg-[#0a0a0a] border border-zinc-900 rounded-2xl p-6 md:p-8 shadow-xl relative">
           <DollarSign className="absolute top-8 right-8 w-12 h-12 text-zinc-800 opacity-50" />
           <p className="text-zinc-500 font-bold uppercase tracking-widest text-sm mb-2">A Pagar (Aberto)</p>
           <p className="text-5xl font-black text-white">{BRL.format(totalComissoesAtuais)}</p>
@@ -75,7 +76,7 @@ export default async function ComissoesPage() {
         </div>
       </div>
 
-      <div className="bg-[#0a0a0a] border border-zinc-900 rounded-[2rem] overflow-hidden shadow-2xl">
+      <div className="bg-[#0a0a0a] border border-zinc-900 rounded-2xl overflow-hidden shadow-xl">
         <Table>
           <TableHeader className="bg-zinc-900/40">
             <TableRow className="border-zinc-900 hover:bg-transparent">

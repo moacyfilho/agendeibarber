@@ -20,7 +20,7 @@ export default async function AssinaturasPage({ searchParams }: { searchParams: 
   const isGracePeriod = subscription && subscription.status === 'PAST_DUE';
 
   return (
-    <div className="p-8 md:p-12 max-w-7xl mx-auto min-h-screen">
+    <div className="p-6 md:p-10 lg:p-12 max-w-7xl mx-auto min-h-screen animate-fade-in-up">
       {searchParams.success && (
         <div className="mb-8 p-6 bg-green-500/10 border border-green-500/20 rounded-2xl text-green-500 font-bold flex items-center gap-3 animate-in fade-in slide-in-from-top-4">
           <CheckCircle2 className="w-6 h-6" /> Parabéns! Sua assinatura Pro foi ativada com sucesso.
@@ -33,12 +33,13 @@ export default async function AssinaturasPage({ searchParams }: { searchParams: 
         </div>
       )}
 
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+      <header className="mb-8 flex items-center gap-4">
+        <div className="page-header-icon">
+          <CreditCard className="w-5 h-5" />
+        </div>
         <div>
-          <h2 className="text-4xl font-extrabold text-zinc-50 mb-2 flex items-center gap-3">
-            <CreditCard className="text-orange-500 w-10 h-10" /> Meu Plano
-          </h2>
-          <p className="text-zinc-400 font-medium text-lg">Gerencie sua assinatura da plataforma SaaS e acesso ao sistema.</p>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Assinatura</h1>
+          <p className="text-zinc-500 font-medium text-sm mt-0.5">Gerencie seu plano e acesso ao sistema</p>
         </div>
       </header>
 

@@ -2,13 +2,15 @@ import { TrendingDown, CalendarClock } from "lucide-react"
 
 export default function ContasPagarPage() {
   return (
-    <div className="p-8 md:p-12 max-w-7xl mx-auto min-h-screen">
-      <header className="mb-10 flex flex-col items-start gap-4">
-        <h2 className="text-4xl font-extrabold text-white mb-2 flex items-center gap-3">
-          <TrendingDown className="text-red-500 w-10 h-10" /> 
-          Contas a Pagar
-        </h2>
-        <p className="text-zinc-400 font-medium text-lg">Gestão inteligente de aluguel, luz, salários, boletos e água.</p>
+    <div className="p-6 md:p-10 lg:p-12 max-w-7xl mx-auto min-h-screen animate-fade-in-up">
+      <header className="mb-8 flex items-center gap-4">
+        <div className="page-header-icon !bg-red-500/10 !border-red-500/15 !text-red-500">
+          <TrendingDown className="w-5 h-5" />
+        </div>
+        <div>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Contas a Pagar</h1>
+          <p className="text-zinc-500 font-medium text-sm mt-0.5">Aluguel, luz, salários e despesas fixas</p>
+        </div>
       </header>
 
       <ul className="flex flex-col gap-4">

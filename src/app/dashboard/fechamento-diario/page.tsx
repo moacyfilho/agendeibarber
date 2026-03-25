@@ -74,13 +74,14 @@ export default async function FechamentoDiarioPage() {
   const totalComissoesCents = Object.values(barberStats).reduce((acc, curr) => acc + curr.totalCommission, 0);
 
   return (
-    <div className="p-8 md:p-12 max-w-7xl mx-auto min-h-screen text-white">
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+    <div className="p-6 md:p-10 lg:p-12 max-w-7xl mx-auto min-h-screen text-white animate-fade-in-up">
+      <header className="mb-8 flex items-center gap-4">
+        <div className="page-header-icon">
+          <CalendarRange className="w-5 h-5" />
+        </div>
         <div>
-          <h2 className="text-4xl font-extrabold text-zinc-50 mb-2 flex items-center gap-3">
-            <CalendarRange className="text-orange-500 w-10 h-10" /> Fechamento Diário
-          </h2>
-          <p className="text-zinc-400 font-medium text-lg text-balance">Resumo operacional detalhado ({todayStart.toLocaleDateString('pt-BR')}).</p>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Fechamento Diário</h1>
+          <p className="text-zinc-500 font-medium text-sm mt-0.5">Resumo operacional de {todayStart.toLocaleDateString('pt-BR')}</p>
         </div>
       </header>
 

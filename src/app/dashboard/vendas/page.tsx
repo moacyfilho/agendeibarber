@@ -16,20 +16,20 @@ export default async function VendasLogPage() {
   const BRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
   return (
-    <div className="p-8 md:p-14 max-w-7xl mx-auto min-h-screen text-white font-[family-name:var(--font-geist-sans)]">
+    <div className="p-6 md:p-10 lg:p-12 max-w-7xl mx-auto min-h-screen text-white animate-fade-in-up">
       <header className="mb-14 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 relative z-10">
         <div>
           <Link href="/dashboard/pdv" className="text-zinc-500 hover:text-orange-500 flex items-center gap-2 mb-4 font-bold transition-colors group">
              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Voltar ao PDV
           </Link>
-          <h2 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-zinc-500 mb-3 tracking-tighter">
+          <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
             Histórico <span className="text-orange-500">de Vendas</span>
-          </h2>
-          <p className="text-zinc-500 font-medium text-lg">Registro cronológico de todas as transações de produtos no balcão.</p>
+          </h1>
+          <p className="text-zinc-500 font-medium text-sm">Registro cronológico de todas as transações de produtos.</p>
         </div>
       </header>
 
-      <div className="bg-[#0a0a0a] border border-zinc-900 rounded-[2.5rem] overflow-hidden shadow-2xl">
+      <div className="bg-[#0a0a0a] border border-zinc-900 rounded-2xl overflow-hidden shadow-xl">
         <Table>
           <TableHeader className="bg-zinc-900/40">
             <TableRow className="border-zinc-900 hover:bg-transparent">
