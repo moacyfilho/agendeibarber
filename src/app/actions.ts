@@ -336,21 +336,33 @@ export async function deleteBlockedTimeAction(blockedTimeId: string) {
   revalidatePath('/dashboard/horarios');
 }
 
+function normalizePhone(phone: string): string {
+  const digits = phone.replace(/\D/g, '');
+  return digits.slice(-9); // últimos 9 dígitos são suficientes para unicidade
+}
+
 export async function checkCustomerByPhoneAction(phone: string, tenantId: string) {
-  const customer = await prisma.user.findFirst({
-    where: { phone, role: 'CUSTOMER', tenantId },
+  const suffix = normalizePhone(phone);
+  if (suffix.length < 8) return null;
+
+  const customers = await prisma.user.findMany({
+    where: { role: 'CUSTOMER', tenantId },
     select: { name: true, phone: true }
   });
-  return customer;
+  return customers.find(c => normalizePhone(c.phone || '') === suffix) ?? null;
 }
 
 export async function registerCustomerAction(name: string, phone: string, tenantId: string) {
   if (!name || !phone || !tenantId) return { error: 'Dados incompletos' };
 
-  // Se já existe, apenas retorna (não duplica)
-  const existing = await prisma.user.findFirst({
-    where: { phone, role: 'CUSTOMER', tenantId }
+  const suffix = normalizePhone(phone);
+
+  // Se já existe (qualquer formato), apenas retorna (não duplica)
+  const customers = await prisma.user.findMany({
+    where: { role: 'CUSTOMER', tenantId },
+    select: { id: true, name: true, phone: true }
   });
+  const existing = customers.find(c => normalizePhone(c.phone || '') === suffix);
   if (existing) return { success: true, name: existing.name };
 
   await prisma.user.create({
