@@ -3,10 +3,14 @@ import Link from 'next/link';
 import React from 'react';
 import { DashboardNav } from './DashboardNav';
 import { MobileSidebarToggle } from './MobileSidebarToggle';
+import { prisma } from '@/lib/prisma';
+import { getTenantId } from '@/lib/session';
 
 export const dynamic = 'force-dynamic'
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const tenantId = await getTenantId();
+  const tenant = await prisma.tenant.findUnique({ where: { id: tenantId }, select: { name: true } });
   return (
     <div className="flex h-screen bg-[#030303] text-zinc-50 font-sans overflow-hidden relative">
 
@@ -38,10 +42,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Scissors className="w-4.5 h-4.5 text-white" strokeWidth={2.5} />
             </div>
             <div className="leading-none">
-              <span className="text-[15px] font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-500">
-                AGENDEI
-              </span>
-              <span className="text-[15px] font-light text-zinc-400 tracking-tight"> BARBER</span>
+              <div>
+                <span className="text-[15px] font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-500">
+                  AGENDEI
+                </span>
+                <span className="text-[15px] font-light text-zinc-400 tracking-tight"> BARBER</span>
+              </div>
+              {tenant?.name && (
+                <span className="text-[11px] text-zinc-600 font-medium truncate max-w-[160px] block mt-0.5">
+                  {tenant.name}
+                </span>
+              )}
             </div>
           </Link>
         </div>
