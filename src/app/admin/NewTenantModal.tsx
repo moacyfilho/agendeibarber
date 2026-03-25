@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Plus, X, Loader2, Eye, EyeOff, Building2, User, Mail, Lock } from "lucide-react";
 import { createTenantAction } from "@/app/actions";
 
@@ -9,6 +10,9 @@ export function NewTenantModal() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [nameValue, setNameValue] = useState('');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
 
   function generateSlug(name: string) {
     return name
@@ -43,8 +47,9 @@ export function NewTenantModal() {
         <Plus className="w-4 h-4" /> Nova Barbearia
       </button>
 
-      {isOpen && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in" onClick={() => setIsOpen(false)}>
+      {isOpen && mounted && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in" onClick={() => setIsOpen(false)}>
+
           <div
             className="bg-[#0a0a0a] border border-zinc-800 p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md relative animate-in zoom-in-95 max-h-[90vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
@@ -169,7 +174,7 @@ export function NewTenantModal() {
             </form>
           </div>
         </div>
-      )}
+      , document.body)}
     </>
   );
 }
