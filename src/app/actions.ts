@@ -87,6 +87,14 @@ export async function updateTenantAction(tenantId: string, formData: FormData) {
   }
 }
 
+export async function updateTenantPlanAction(tenantId: string, plan: string) {
+  await prisma.tenant.update({
+    where: { id: tenantId },
+    data: { plan }
+  });
+  revalidatePath('/admin');
+}
+
 export async function deleteTenantAction(tenantId: string) {
   try {
     await prisma.tenant.delete({

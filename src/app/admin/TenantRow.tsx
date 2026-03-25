@@ -1,14 +1,21 @@
 "use client";
 
-import { Power, ArrowRight, Loader2, Trash2, ExternalLink, Users, Calendar, Briefcase, Clock } from "lucide-react";
+import { Power, Loader2, Trash2, ExternalLink, Users, Calendar, Briefcase, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { toggleTenantStatusAction, deleteTenantAction } from "@/app/actions";
+import { toggleTenantStatusAction, deleteTenantAction, updateTenantPlanAction } from "@/app/actions";
 import { useState } from "react";
 import { EditTenantModal } from "./EditTenantModal";
 
+const PLANS = [
+  { value: 'FREE', label: 'Free', color: 'text-zinc-400 border-zinc-700 bg-zinc-900' },
+  { value: 'PROFISSIONAL', label: 'Profissional', color: 'text-orange-400 border-orange-500/30 bg-orange-500/10' },
+  { value: 'ENTERPRISE', label: 'Enterprise', color: 'text-purple-400 border-purple-500/30 bg-purple-500/10' },
+];
+
 export function TenantRow({ t }: { t: any }) {
   const [loading, setLoading] = useState(false);
+  const [planLoading, setPlanLoading] = useState(false);
 
   async function handleToggle() {
     setLoading(true);
@@ -18,6 +25,18 @@ export function TenantRow({ t }: { t: any }) {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handlePlanChange(plan: string) {
+    if (plan === (t.plan || 'FREE')) return;
+    setPlanLoading(true);
+    try {
+      await updateTenantPlanAction(t.id, plan);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setPlanLoading(false);
     }
   }
 
@@ -101,9 +120,23 @@ export function TenantRow({ t }: { t: any }) {
           {format(new Date(t.createdAt), "dd MMM yyyy", { locale: ptBR })}
         </div>
 
-        <span className="text-[10px] font-bold bg-zinc-900 text-zinc-400 px-3 py-1.5 rounded-lg border border-zinc-800">
-          {t.plan || 'Free'}
-        </span>
+        <div className="flex items-center gap-1 bg-zinc-900/50 border border-zinc-800/50 rounded-lg p-1">
+          {PLANS.map((p) => {
+            const active = (t.plan || 'FREE') === p.value;
+            return (
+              <button
+                key={p.value}
+                onClick={() => handlePlanChange(p.value)}
+                disabled={planLoading}
+                className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md transition-all disabled:opacity-50 ${
+                  active ? p.color + ' border' : 'text-zinc-600 hover:text-zinc-400'
+                }`}
+              >
+                {planLoading && active ? <Loader2 className="w-2.5 h-2.5 animate-spin" /> : p.label}
+              </button>
+            );
+          })}
+        </div>
 
         <EditTenantModal t={t} />
 
