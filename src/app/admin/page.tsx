@@ -62,9 +62,11 @@ export default async function SuperAdminDashboard() {
 
   const mrrFormatted = mrr.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   const annualizedRevenue = (mrr * 12).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const payingTenants = planCounts.STARTER + planCounts.PROFISSIONAL + planCounts.PREMIUM;
+
   const growthRate = tenantsLastMonth > 0
     ? ((tenantsThisMonth - tenantsLastMonth) / tenantsLastMonth * 100).toFixed(0)
-    : tenantsThisMonth > 0 ? '∞' : '0';
+    : tenantsThisMonth > 0 ? 'novo' : '0';
 
   const maxPlanCount = Math.max(planCounts.STARTER, planCounts.PROFISSIONAL, planCounts.PREMIUM, 1);
 
@@ -226,8 +228,8 @@ export default async function SuperAdminDashboard() {
           </div>
           <div>
             <p className="text-[9px] font-bold text-zinc-600 uppercase tracking-wider">Crescimento</p>
-            <p className={`text-lg font-black ${Number(growthRate) >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-              {growthRate === '∞' ? '∞' : `${Number(growthRate) >= 0 ? '+' : ''}${growthRate}%`}
+            <p className={`text-lg font-black ${growthRate === 'novo' || Number(growthRate) >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+              {growthRate === 'novo' ? '1º mês' : `${Number(growthRate) >= 0 ? '+' : ''}${growthRate}%`}
             </p>
           </div>
         </div>
@@ -251,9 +253,9 @@ export default async function SuperAdminDashboard() {
           <div>
             <p className="text-[9px] font-bold text-zinc-600 uppercase tracking-wider">Plano médio</p>
             <p className="text-lg font-black text-white">
-              {activeTenants > 0
-                ? (mrr / activeTenants).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-                : 'R$ 0'}
+              {payingTenants > 0
+                ? (mrr / payingTenants).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                : '—'}
             </p>
           </div>
         </div>
