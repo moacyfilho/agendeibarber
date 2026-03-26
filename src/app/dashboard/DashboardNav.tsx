@@ -7,7 +7,7 @@ import {
   Calendar, CalendarDays, CreditCard,
   DollarSign, Clock, Wallet, TrendingDown,
   TrendingUp, BarChart2, Calculator, Scale,
-  Palette, Star, type LucideIcon
+  Palette, Star, ShoppingBag, type LucideIcon
 } from 'lucide-react';
 
 function NavItem({ href, icon: Icon, label, alert, badge, collapsed }: {
@@ -87,6 +87,7 @@ export function DashboardNav({ collapsed }: { collapsed?: boolean }) {
       <SectionDivider label="Financeiro" collapsed={collapsed} />
       <NavItem href="/dashboard/caixa"     icon={Wallet}       label="Caixa (PDV)"      collapsed={collapsed} />
       <NavItem href="/dashboard/pdv"       icon={Package}      label="Venda Rápida"     collapsed={collapsed} />
+      <NavItem href="/dashboard/vendas"    icon={ShoppingBag}  label="Histórico Vendas"  collapsed={collapsed} />
       <NavItem href="/dashboard/comissoes" icon={DollarSign}   label="Comissões"        collapsed={collapsed} />
       <NavItem href="/dashboard/pagar"     icon={TrendingDown} label="Contas a Pagar"   collapsed={collapsed} alert />
       <NavItem href="/dashboard/receber"   icon={TrendingUp}   label="Contas a Receber" collapsed={collapsed} />

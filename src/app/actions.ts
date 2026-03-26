@@ -14,6 +14,27 @@ async function getTenantContext() {
   return getTenantId();
 }
 
+// Converte entrada de preço em centavos — aceita "109", "109,00", "R$ 109,00", "109.00"
+function parsePriceToCents(raw?: string | null): number {
+  if (!raw) return 0;
+  const s = raw.replace(/R\$\s?/g, '').trim();
+  if (s.includes(',')) {
+    const [intPart, decPart = '00'] = s.split(',');
+    const intDigits = intPart.replace(/\D/g, '');
+    const decDigits = decPart.replace(/\D/g, '').padEnd(2, '0').slice(0, 2);
+    return parseInt(intDigits + decDigits, 10) || 0;
+  }
+  if (s.includes('.')) {
+    const parts = s.split('.');
+    if (parts.at(-1)!.length <= 2) {
+      return Math.round(parseFloat(s) * 100);
+    }
+    return parseInt(s.replace(/\./g, ''), 10) * 100;
+  }
+  const n = parseInt(s.replace(/\D/g, ''), 10);
+  return isNaN(n) ? 0 : n * 100;
+}
+
 export async function createTenantAction(formData: FormData) {
   const name = formData.get('name') as string;
   const rawSlug = formData.get('slug') as string;
@@ -160,7 +181,7 @@ export async function createServicoAction(formData: FormData) {
 
   const numTime = parseInt(time) || 30;
   // Convertemos o "R$ 50,00" limpando texto para salvar um inteiro
-  const priceClean = parseInt(price?.replace(/\D/g, '') || '3000'); 
+  const priceClean = parsePriceToCents(price) || 3000;
 
   const tenantId = await getTenantContext();
   await prisma.service.create({
@@ -457,7 +478,7 @@ export async function createProductAction(formData: FormData) {
 
   if (!name) return;
 
-  const priceClean = parseInt(price?.replace(/\D/g, '') || '0');
+  const priceClean = parsePriceToCents(price) || 0;
   const numStock = parseInt(stock) || 0;
   const numMinStock = parseInt(minStock) || 5;
 
@@ -604,7 +625,7 @@ export async function updateServicoAction(id: string, formData: FormData) {
   const price = formData.get('sprice') as string;
   if (!name) return { error: 'Nome é obrigatório.' };
   const numTime = parseInt(time) || 30;
-  const priceClean = parseInt(price?.replace(/\D/g, '') || '0');
+  const priceClean = parsePriceToCents(price) || 0;
   await prisma.service.updateMany({ where: { id, tenantId }, data: { name, durationMinutes: numTime, priceInCents: priceClean } });
   revalidatePath('/dashboard/servicos');
   return { success: true };
@@ -626,7 +647,7 @@ export async function updateProductAction(id: string, formData: FormData) {
   const stock = formData.get('stock') as string;
   const minStock = formData.get('minStock') as string;
   if (!name) return { error: 'Nome é obrigatório.' };
-  const priceClean = parseInt(price?.replace(/\D/g, '') || '0');
+  const priceClean = parsePriceToCents(price) || 0;
   await prisma.product.updateMany({
     where: { id, tenantId },
     data: { name, priceInCents: priceClean, stock: parseInt(stock) || 0, minStock: parseInt(minStock) || 5 }
@@ -640,4 +661,16 @@ export async function deleteProductAction(id: string) {
   await prisma.product.deleteMany({ where: { id, tenantId } });
   revalidatePath('/dashboard/produtos');
   return { success: true };
+}
+
+// ─── Horários de Funcionamento ────────────────────────────────────────────────
+
+export async function updateBusinessHoursAction(hoursJson: string) {
+  const tenantId = await getTenantContext();
+  await prisma.tenant.update({
+    where: { id: tenantId },
+    data: { openingHours: hoursJson },
+  });
+  revalidatePath('/dashboard/horarios');
+  revalidatePath('/dashboard/configuracoes');
 }

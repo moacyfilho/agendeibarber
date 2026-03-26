@@ -9,7 +9,7 @@ function fmt(cents: number) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cents / 100);
 }
 
-export default async function FechamentoMensalPage({ searchParams }: { searchParams: { mes?: string; ano?: string } }) {
+export default async function FechamentoMensalPage({ searchParams }: { searchParams: { mes?: string; ano?: string; barbeiro?: string } }) {
   const tenantId = await getTenantId();
 
   const now = new Date();
@@ -24,11 +24,13 @@ export default async function FechamentoMensalPage({ searchParams }: { searchPar
   const prevLink = `/dashboard/fechamento-mensal?mes=${prevDate.getMonth() + 1}&ano=${prevDate.getFullYear()}`;
   const nextLink = `/dashboard/fechamento-mensal?mes=${nextDate.getMonth() + 1}&ano=${nextDate.getFullYear()}`;
   const isCurrentMonth = year === now.getFullYear() && month === now.getMonth() + 1;
+  const selectedBarbeiro = searchParams.barbeiro || 'all';
+  const barbers = await prisma.user.findMany({ where: { role: 'BARBER', tenantId }, select: { id: true, name: true }, orderBy: { name: 'asc' } });
   const monthLabel = start.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
 
   const [appointments, sales, billsPaid] = await Promise.all([
     prisma.appointment.findMany({
-      where: { tenantId, status: 'COMPLETED', paymentStatus: 'PAID', scheduledAt: { gte: start, lt: end } },
+      where: { tenantId, status: 'COMPLETED', paymentStatus: 'PAID', scheduledAt: { gte: start, lt: end }, ...(selectedBarbeiro !== 'all' ? { barberId: selectedBarbeiro } : {}) },
       include: { barber: { select: { name: true } } },
     }),
     prisma.sale.findMany({
@@ -92,6 +94,30 @@ export default async function FechamentoMensalPage({ searchParams }: { searchPar
           </Link>
         </div>
       </header>
+
+      {/* Filtros */}
+      <div className="flex flex-wrap gap-3 mb-6">
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-zinc-500 font-bold uppercase tracking-widest">Barbeiro:</span>
+          <div className="flex flex-wrap gap-1.5">
+            <a
+              href={`/dashboard/fechamento-mensal?mes=${month}&ano=${year}`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${selectedBarbeiro === 'all' ? 'bg-orange-500/15 text-orange-400 border-orange-500/20' : 'bg-zinc-900/40 text-zinc-500 border-zinc-800 hover:border-zinc-700 hover:text-zinc-300'}`}
+            >
+              Todos
+            </a>
+            {barbers.map(b => (
+              <a
+                key={b.id}
+                href={`/dashboard/fechamento-mensal?mes=${month}&ano=${year}&barbeiro=${b.id}`}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${selectedBarbeiro === b.id ? 'bg-orange-500/15 text-orange-400 border-orange-500/20' : 'bg-zinc-900/40 text-zinc-500 border-zinc-800 hover:border-zinc-700 hover:text-zinc-300'}`}
+              >
+                {b.name}
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* Métricas */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">

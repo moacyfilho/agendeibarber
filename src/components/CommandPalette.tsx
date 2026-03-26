@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import {
   Search, Calendar, Users, Scissors, Package, BarChart2,
   Settings, Wallet, CalendarDays, DollarSign, TrendingDown,
-  TrendingUp, Calculator, CreditCard, X, ArrowRight
+  TrendingUp, Calculator, CreditCard, ShoppingBag, X, ArrowRight
 } from 'lucide-react';
 
 const COMMANDS = [
@@ -17,6 +17,7 @@ const COMMANDS = [
   { label: 'Produtos',              href: '/dashboard/produtos',           icon: Package,      section: 'Gestão' },
   { label: 'Atendimentos',          href: '/dashboard/atendimentos',       icon: Calendar,     section: 'Gestão' },
   { label: 'Caixa (PDV)',           href: '/dashboard/caixa',              icon: Wallet,       section: 'Financeiro' },
+  { label: 'Histórico de Vendas',   href: '/dashboard/vendas',             icon: ShoppingBag,  section: 'Financeiro' },
   { label: 'Comissões',             href: '/dashboard/comissoes',          icon: DollarSign,   section: 'Financeiro' },
   { label: 'Contas a Pagar',        href: '/dashboard/pagar',              icon: TrendingDown, section: 'Financeiro' },
   { label: 'Contas a Receber',      href: '/dashboard/receber',            icon: TrendingUp,   section: 'Financeiro' },
