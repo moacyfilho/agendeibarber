@@ -10,6 +10,7 @@ import {
   checkCustomerByPhoneAction,
   createBlockedTimeAction,
 } from '@/app/actions';
+import { ComandaModal } from '@/components/ComandaModal';
 
 const SLOT_HEIGHT = 56; // px por slot de 30min
 const START_HOUR = 8;
@@ -50,14 +51,17 @@ type Appointment = {
 type Barber = { id: string; name: string; avatarUrl: string | null };
 type Service = { id: string; name: string; durationMinutes: number; priceInCents: number };
 
+type Product = { id: string; name: string; priceInCents: number; stock: number };
+
 interface Props {
   barbers: Barber[];
   services: Service[];
   initialAppointments: Appointment[];
   tenantId: string;
+  products: Product[];
 }
 
-export function AgendaClient({ barbers, services, initialAppointments, tenantId }: Props) {
+export function AgendaClient({ barbers, services, initialAppointments, tenantId, products }: Props) {
   const [mounted, setMounted] = useState(false);
   const [viewMode, setViewMode] = useState<'day' | 'week'>('day');
   const [currentDate, setCurrentDate] = useState<Date | null>(null);
@@ -293,15 +297,14 @@ export function AgendaClient({ barbers, services, initialAppointments, tenantId 
                   return (
                     <BarberColumn
                       key={barber.id}
-                      barber={barber}
                       color={color}
                       slots={slots}
                       slotHeight={SLOT_HEIGHT}
                       appointments={dayApps}
-                      date={currentDate}
                       isToday={isToday(currentDate)}
                       nowY={isToday(currentDate) ? nowY : null}
                       onCellClick={(slot) => handleCellClick(barber.id, currentDate, slot)}
+                      products={products}
                     />
                   );
                 })
@@ -314,11 +317,11 @@ export function AgendaClient({ barbers, services, initialAppointments, tenantId 
                       slots={slots}
                       slotHeight={SLOT_HEIGHT}
                       appointments={dayApps}
-                      date={day}
                       isToday={isToday(day)}
                       nowY={isToday(day) ? nowY : null}
                       colors={BARBER_COLORS}
                       onCellClick={(slot) => handleCellClick(visibleBarbers[0]?.id || '', day, slot)}
+                      products={products}
                     />
                   );
                 })
@@ -343,7 +346,7 @@ export function AgendaClient({ barbers, services, initialAppointments, tenantId 
 }
 
 /* ── Coluna dia/barbeiro ── */
-function BarberColumn({ color, slots, slotHeight, appointments, isToday: _isToday, nowY, onCellClick }: {
+function BarberColumn({ color, slots, slotHeight, appointments, isToday: _isToday, nowY, onCellClick, products }: {
   color: typeof BARBER_COLORS[0];
   slots: string[];
   slotHeight: number;
@@ -351,6 +354,7 @@ function BarberColumn({ color, slots, slotHeight, appointments, isToday: _isToda
   isToday: boolean;
   nowY: number | null;
   onCellClick: (slot: string) => void;
+  products: Product[];
 }) {
   return (
     <div className={`flex-1 min-w-0 border-r border-zinc-900 last:border-r-0 relative`}>
@@ -382,21 +386,29 @@ function BarberColumn({ color, slots, slotHeight, appointments, isToday: _isToda
         const endMin = end.getHours() * 60 + end.getMinutes();
         const top = minutesToY(startMin);
         const height = Math.max(slotHeight, minutesToY(endMin) - top);
+        // ComandaModal espera scheduledAt como Date
+        const appForComanda = { ...app, scheduledAt: start, endTime: end };
 
         return (
-          <div
+          <ComandaModal
             key={app.id}
-            className={`absolute left-1 right-1 rounded-xl border ${color.card} px-2 py-1.5 z-10 cursor-pointer overflow-hidden transition-all hover:brightness-125`}
-            style={{ top: top + 2, height: height - 4 }}
-          >
-            <p className={`text-[11px] font-black leading-tight truncate ${color.text}`}>{app.customer.name}</p>
-            <p className="text-[10px] text-zinc-500 truncate">{app.service.name}</p>
-            {height > 50 && (
-              <p className="text-[9px] text-zinc-600 mt-0.5">
-                {format(new Date(app.scheduledAt), 'HH:mm')} – {format(end, 'HH:mm')}
-              </p>
-            )}
-          </div>
+            appointment={appForComanda}
+            products={products}
+            trigger={
+              <div
+                className={`absolute left-1 right-1 rounded-xl border ${color.card} px-2 py-1.5 z-10 cursor-pointer overflow-hidden transition-all hover:brightness-125`}
+                style={{ top: top + 2, height: height - 4 }}
+              >
+                <p className={`text-[11px] font-black leading-tight truncate ${color.text}`}>{app.customer.name}</p>
+                <p className="text-[10px] text-zinc-500 truncate">{app.service.name}</p>
+                {height > 50 && (
+                  <p className="text-[9px] text-zinc-600 mt-0.5">
+                    {format(start, 'HH:mm')} – {format(end, 'HH:mm')}
+                  </p>
+                )}
+              </div>
+            }
+          />
         );
       })}
     </div>
@@ -404,7 +416,7 @@ function BarberColumn({ color, slots, slotHeight, appointments, isToday: _isToda
 }
 
 /* ── Coluna semana ── */
-function WeekColumn({ barbers, slots, slotHeight, appointments, isToday, nowY, colors, onCellClick }: {
+function WeekColumn({ barbers, slots, slotHeight, appointments, isToday, nowY, colors, onCellClick, products }: {
   barbers: Barber[];
   slots: string[];
   slotHeight: number;
@@ -413,6 +425,7 @@ function WeekColumn({ barbers, slots, slotHeight, appointments, isToday, nowY, c
   nowY: number | null;
   colors: typeof BARBER_COLORS;
   onCellClick: (slot: string) => void;
+  products: Product[];
 }) {
   return (
     <div className={`flex-1 min-w-0 border-r border-zinc-900 last:border-r-0 relative ${isToday ? 'bg-orange-500/[0.02]' : ''}`}>
@@ -440,16 +453,23 @@ function WeekColumn({ barbers, slots, slotHeight, appointments, isToday, nowY, c
         const end = app.endTime ? new Date(app.endTime) : new Date(start.getTime() + 30 * 60000);
         const top = minutesToY(start.getHours() * 60 + start.getMinutes());
         const height = Math.max(slotHeight - 4, minutesToY(end.getHours() * 60 + end.getMinutes()) - top);
+        const appForComanda = { ...app, scheduledAt: start, endTime: end };
 
         return (
-          <div
+          <ComandaModal
             key={app.id}
-            className={`absolute left-0.5 right-0.5 rounded-lg border ${color.card} px-1.5 py-1 z-10 overflow-hidden`}
-            style={{ top: top + 2, height: height - 4 }}
-          >
-            <p className={`text-[10px] font-black truncate ${color.text}`}>{app.customer.name}</p>
-            <p className="text-[9px] text-zinc-600 truncate">{app.service.name}</p>
-          </div>
+            appointment={appForComanda}
+            products={products}
+            trigger={
+              <div
+                className={`absolute left-0.5 right-0.5 rounded-lg border ${color.card} px-1.5 py-1 z-10 overflow-hidden cursor-pointer hover:brightness-125 transition-all`}
+                style={{ top: top + 2, height: height - 4 }}
+              >
+                <p className={`text-[10px] font-black truncate ${color.text}`}>{app.customer.name}</p>
+                <p className="text-[9px] text-zinc-600 truncate">{app.service.name}</p>
+              </div>
+            }
+          />
         );
       })}
     </div>

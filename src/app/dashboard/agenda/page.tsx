@@ -8,9 +8,10 @@ export const dynamic = 'force-dynamic'
 export default async function AgendaPage() {
   const tenantId = await getTenantId();
 
-  const [barbers, services] = await Promise.all([
+  const [barbers, services, products] = await Promise.all([
     prisma.user.findMany({ where: { role: 'BARBER', tenantId }, orderBy: { name: 'asc' } }),
     prisma.service.findMany({ where: { isActive: true, tenantId }, orderBy: { name: 'asc' } }),
+    prisma.product.findMany({ where: { isActive: true, tenantId }, orderBy: { name: 'asc' } }),
   ]);
 
   // Busca agendamentos dos próximos 30 dias (suficiente para vista semanal)
@@ -62,6 +63,7 @@ export default async function AgendaPage() {
           services={services}
           initialAppointments={serialized as any}
           tenantId={tenantId}
+          products={products}
         />
       </div>
     </div>
