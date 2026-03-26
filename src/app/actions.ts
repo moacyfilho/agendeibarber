@@ -61,7 +61,8 @@ export async function createTenantAction(formData: FormData) {
   try {
     const passwordHash = await bcrypt.hash(ownerPassword, 12);
 
-    const tenant = await prisma.tenant.create({ data: { name, slug } });
+    const plan = (formData.get('plan') as string) || 'STARTER';
+    const tenant = await prisma.tenant.create({ data: { name, slug, plan } });
 
     await prisma.user.create({
       data: {
