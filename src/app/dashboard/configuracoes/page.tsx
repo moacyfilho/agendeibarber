@@ -1,8 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getTenantId } from '@/lib/session';
-import { Settings, Palette, MapPin, Camera, Phone, Clock, Save } from "lucide-react";
+import { headers } from "next/headers";
+import { Palette, MapPin, Camera, Phone, Clock, Save, Link2, Smartphone } from "lucide-react";
 import { redirect } from "next/navigation";
+import { LinkCopiavel } from "@/components/LinkCopiavel";
 
 async function getTenantForDashboard(tenantId: string) {
   const tenant = await prisma.tenant.findUnique({ where: { id: tenantId } });
@@ -31,8 +33,65 @@ export default async function ConfiguracoesPage() {
   const tenant = await getTenantForDashboard(tenantId);
   if (!tenant) return <div className="text-white p-10 text-xl">Nenhum tenant encontrado.</div>;
 
+  // Detecta o host para montar os links
+  const hdrs = await headers();
+  const host = hdrs.get('x-forwarded-host') || hdrs.get('host') || 'localhost:3000';
+  const protocol = host.includes('localhost') ? 'http' : 'https';
+  const baseUrl = `${protocol}://${host}`;
+  const clientBookingUrl = `${baseUrl}/${tenant.slug}`;
+  const dashboardUrl = `${baseUrl}/login`;
+
   return (
     <div className="p-6 md:p-10 lg:p-12 max-w-5xl animate-fade-in-up">
+
+      {/* ── LINKS DE ACESSO ── */}
+      <div className="mb-8 bg-zinc-950/80 border border-orange-500/15 rounded-[2rem] p-8 space-y-5">
+        <h3 className="text-xl font-black text-white flex items-center gap-3">
+          <Link2 className="text-orange-500 w-6 h-6" /> Links de Acesso
+        </h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Link Clientes */}
+          <div className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-5 space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/15 flex items-center justify-center">
+                <Smartphone className="w-4 h-4 text-emerald-400" />
+              </div>
+              <div>
+                <p className="text-white font-bold text-sm">Página de Agendamento</p>
+                <p className="text-zinc-600 text-xs">Compartilhe com seus clientes</p>
+              </div>
+            </div>
+            <LinkCopiavel
+              url={clientBookingUrl}
+              label="Clientes acessam este link para agendar:"
+            />
+          </div>
+
+          {/* Link Barbeiros/Dashboard */}
+          <div className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-5 space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-xl bg-orange-500/10 border border-orange-500/15 flex items-center justify-center">
+                <Link2 className="w-4 h-4 text-orange-400" />
+              </div>
+              <div>
+                <p className="text-white font-bold text-sm">Painel dos Barbeiros</p>
+                <p className="text-zinc-600 text-xs">Para barbeiros e donos</p>
+              </div>
+            </div>
+            <LinkCopiavel
+              url={dashboardUrl}
+              label="Barbeiros fazem login por aqui:"
+            />
+          </div>
+        </div>
+
+        <p className="text-xs text-zinc-600 flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-orange-500 inline-block" />
+          O link de agendamento pode ser compartilhado no WhatsApp, Instagram e impresso como QR Code.
+        </p>
+      </div>
+
       <header className="mb-8 flex items-center gap-4">
         <div className="page-header-icon">
           <Palette className="w-5 h-5" />
