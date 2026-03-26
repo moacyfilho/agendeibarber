@@ -7,45 +7,35 @@ import {
   Calendar, CalendarDays, CreditCard,
   DollarSign, Clock, Wallet, TrendingDown,
   TrendingUp, BarChart2, Calculator, Scale,
-  Palette, type LucideIcon
+  Palette, Star, type LucideIcon
 } from 'lucide-react';
 
-function NavItem({ href, icon: Icon, label, alert, badge }: {
-  href: string;
-  icon: LucideIcon;
-  label: string;
-  alert?: boolean;
-  badge?: string;
+function NavItem({ href, icon: Icon, label, alert, badge, collapsed }: {
+  href: string; icon: LucideIcon; label: string;
+  alert?: boolean; badge?: string; collapsed?: boolean;
 }) {
   const pathname = usePathname();
   const isActive = pathname === href;
-
   return (
     <Link
       href={href}
-      className={`group relative flex items-center gap-3 px-3.5 py-2 rounded-xl text-[13px] font-medium border transition-all duration-200 ${
-        isActive
+      title={collapsed ? label : undefined}
+      className={`group relative flex items-center gap-3 rounded-xl text-[13px] font-medium border transition-all duration-200
+        ${collapsed ? 'px-0 py-2.5 justify-center' : 'px-3.5 py-2'}
+        ${isActive
           ? 'bg-orange-500/8 text-orange-300 border-orange-500/15 shadow-[0_0_12px_rgba(249,115,22,0.06)]'
           : 'text-zinc-500 border-transparent hover:bg-white/[0.03] hover:text-zinc-300 hover:border-white/[0.04]'
-      }`}
+        }`}
     >
-      {isActive && (
+      {isActive && !collapsed && (
         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 bg-orange-500 rounded-r-full shadow-[0_0_8px_rgba(249,115,22,0.9)]" />
       )}
-      <Icon
-        className={`w-[16px] h-[16px] flex-shrink-0 transition-colors ${
-          alert
-            ? 'text-red-400'
-            : isActive
-            ? 'text-orange-400'
-            : 'text-zinc-600 group-hover:text-zinc-400'
-        }`}
-      />
-      <span className="truncate leading-none">{label}</span>
-      {alert && (
-        <span className="absolute right-3 w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.9)] animate-pulse" />
-      )}
-      {badge && (
+      <Icon className={`flex-shrink-0 transition-colors ${collapsed ? 'w-[18px] h-[18px]' : 'w-[16px] h-[16px]'}
+        ${alert ? 'text-red-400' : isActive ? 'text-orange-400' : 'text-zinc-600 group-hover:text-zinc-400'}`} />
+      {!collapsed && <span className="truncate leading-none">{label}</span>}
+      {alert && !collapsed && <span className="absolute right-3 w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.9)] animate-pulse" />}
+      {alert && collapsed  && <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />}
+      {badge && !collapsed && (
         <span className="absolute right-3 text-[8px] font-black bg-orange-500/10 text-orange-400 border border-orange-500/15 px-1.5 py-0.5 rounded-md uppercase tracking-wide">
           {badge}
         </span>
@@ -54,73 +44,64 @@ function NavItem({ href, icon: Icon, label, alert, badge }: {
   );
 }
 
-function SectionDivider({ label }: { label: string }) {
+function SectionDivider({ label, collapsed }: { label: string; collapsed?: boolean }) {
+  if (collapsed) return <div className="h-px bg-zinc-800/60 mx-1 my-2" />;
   return (
     <div className="flex items-center gap-3 px-4 mt-5 mb-1.5">
-      <span className="text-[9px] font-bold tracking-[0.15em] text-zinc-600 uppercase whitespace-nowrap">
-        {label}
-      </span>
+      <span className="text-[9px] font-bold tracking-[0.15em] text-zinc-600 uppercase whitespace-nowrap">{label}</span>
       <div className="h-px bg-zinc-800/60 flex-1" />
     </div>
   );
 }
 
-export function DashboardNav() {
+export function DashboardNav({ collapsed }: { collapsed?: boolean }) {
   const pathname = usePathname();
   const isDashboardRoot = pathname === '/dashboard';
 
   return (
-    <nav className="flex flex-col gap-0.5 px-3 pb-8">
-
-      {/* Visão Central - sempre primeiro */}
+    <nav className={`flex flex-col gap-0.5 pb-8 ${collapsed ? 'px-2' : 'px-3'}`}>
       <Link
         href="/dashboard"
-        className={`group relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13px] font-semibold border transition-all duration-200 ${
-          isDashboardRoot
+        title={collapsed ? 'Painel Principal' : undefined}
+        className={`group relative flex items-center gap-3 rounded-xl text-[13px] font-semibold border transition-all duration-200
+          ${collapsed ? 'px-0 py-2.5 justify-center' : 'px-3.5 py-2.5'}
+          ${isDashboardRoot
             ? 'bg-orange-500/8 text-orange-300 border-orange-500/15 shadow-[0_0_12px_rgba(249,115,22,0.06)]'
             : 'text-zinc-500 border-transparent hover:bg-white/[0.03] hover:text-zinc-300 hover:border-white/[0.04]'
-        }`}
+          }`}
       >
-        {isDashboardRoot && (
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 bg-orange-500 rounded-r-full shadow-[0_0_8px_rgba(249,115,22,0.9)]" />
-        )}
-        <LayoutDashboard className={`w-4 h-4 flex-shrink-0 ${isDashboardRoot ? 'text-orange-400' : 'text-zinc-600'}`} />
-        Painel Principal
+        {isDashboardRoot && !collapsed && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 bg-orange-500 rounded-r-full shadow-[0_0_8px_rgba(249,115,22,0.9)]" />}
+        <LayoutDashboard className={`flex-shrink-0 ${collapsed ? 'w-[18px] h-[18px]' : 'w-4 h-4'} ${isDashboardRoot ? 'text-orange-400' : 'text-zinc-600'}`} />
+        {!collapsed && 'Painel Principal'}
       </Link>
 
-      <SectionDivider label="Gestão" />
+      <SectionDivider label="Gestão" collapsed={collapsed} />
+      <NavItem href="/dashboard/clientes"     icon={Users}        label="Clientes"      collapsed={collapsed} />
+      <NavItem href="/dashboard/barbeiros"    icon={Scissors}     label="Barbeiros"     collapsed={collapsed} />
+      <NavItem href="/dashboard/servicos"     icon={Briefcase}    label="Serviços"      collapsed={collapsed} />
+      <NavItem href="/dashboard/produtos"     icon={Package}      label="Produtos"      collapsed={collapsed} />
+      <NavItem href="/dashboard/atendimentos" icon={Calendar}     label="Atendimentos"  collapsed={collapsed} />
+      <NavItem href="/dashboard/agenda"       icon={CalendarDays} label="Agenda"        collapsed={collapsed} />
+      <NavItem href="/dashboard/horarios"     icon={Clock}        label="Horários"      collapsed={collapsed} />
 
-      <NavItem href="/dashboard/clientes"     icon={Users}       label="Clientes" />
-      <NavItem href="/dashboard/barbeiros"    icon={Scissors}    label="Barbeiros" />
-      <NavItem href="/dashboard/servicos"     icon={Briefcase}   label="Serviços" />
-      <NavItem href="/dashboard/produtos"     icon={Package}     label="Produtos" />
-      <NavItem href="/dashboard/atendimentos" icon={Calendar}    label="Atendimentos" />
-      <NavItem href="/dashboard/agenda"       icon={CalendarDays} label="Agenda" />
-      <NavItem href="/dashboard/horarios"     icon={Clock}       label="Horários" />
+      <SectionDivider label="Financeiro" collapsed={collapsed} />
+      <NavItem href="/dashboard/caixa"     icon={Wallet}       label="Caixa (PDV)"      collapsed={collapsed} />
+      <NavItem href="/dashboard/pdv"       icon={Package}      label="Venda Rápida"     collapsed={collapsed} />
+      <NavItem href="/dashboard/comissoes" icon={DollarSign}   label="Comissões"        collapsed={collapsed} />
+      <NavItem href="/dashboard/pagar"     icon={TrendingDown} label="Contas a Pagar"   collapsed={collapsed} alert />
+      <NavItem href="/dashboard/receber"   icon={TrendingUp}   label="Contas a Receber" collapsed={collapsed} />
 
-      <SectionDivider label="Financeiro" />
+      <SectionDivider label="Inteligência" collapsed={collapsed} />
+      <NavItem href="/dashboard/relatorios"        icon={BarChart2}  label="Relatórios"       collapsed={collapsed} badge="AI" />
+      <NavItem href="/dashboard/fechamento-diario" icon={Calculator} label="Fechamento Diário" collapsed={collapsed} />
+      <NavItem href="/dashboard/fechamento-mensal" icon={Scale}      label="Balanço Mensal"    collapsed={collapsed} />
 
-      <NavItem href="/dashboard/caixa"           icon={Wallet}      label="Caixa (PDV)" />
-      <NavItem href="/dashboard/pdv"             icon={Package}     label="Venda Rápida" />
-      <NavItem href="/dashboard/comissoes"       icon={DollarSign}  label="Comissões" />
-      <NavItem href="/dashboard/pagar"           icon={TrendingDown} label="Contas a Pagar" alert />
-      <NavItem href="/dashboard/receber"         icon={TrendingUp}  label="Contas a Receber" />
+      <SectionDivider label="Assinaturas" collapsed={collapsed} />
+      <NavItem href="/dashboard/planos"      icon={Star}       label="Planos p/ Clientes" collapsed={collapsed} badge={collapsed ? undefined : 'novo'} />
+      <NavItem href="/dashboard/assinaturas" icon={CreditCard} label="Minha Assinatura"   collapsed={collapsed} />
 
-      <SectionDivider label="Inteligência" />
-
-      <NavItem href="/dashboard/relatorios"       icon={BarChart2}  label="Relatórios" badge="AI" />
-      <NavItem href="/dashboard/fechamento-diario" icon={Calculator} label="Fechamento Diário" />
-      <NavItem href="/dashboard/fechamento-mensal" icon={Scale}      label="Balanço Mensal" />
-
-      <SectionDivider label="Assinaturas" />
-
-      <NavItem href="/dashboard/planos"       icon={CreditCard}  label="Planos p/ Clientes" badge="novo" />
-      <NavItem href="/dashboard/assinaturas"  icon={CreditCard}  label="Minha Assinatura" />
-
-      <SectionDivider label="Configurações" />
-
-      <NavItem href="/dashboard/configuracoes" icon={Palette} label="Personalizar" />
-
+      <SectionDivider label="Config" collapsed={collapsed} />
+      <NavItem href="/dashboard/configuracoes" icon={Palette} label="Personalizar" collapsed={collapsed} />
     </nav>
   );
 }
