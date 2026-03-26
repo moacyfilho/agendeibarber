@@ -1,13 +1,12 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Plus, X, Loader2, Search, Lock, CheckCircle2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, X, Loader2, Search, Lock } from 'lucide-react';
 import { format, addDays, subDays, startOfWeek, addWeeks, subWeeks, isSameDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { createPortal } from 'react-dom';
 import {
   createAppointmentAction,
-  checkCustomerByPhoneAction,
   createBlockedTimeAction,
 } from '@/app/actions';
 import { ComandaModal } from '@/components/ComandaModal';
@@ -52,6 +51,7 @@ type Barber = { id: string; name: string; avatarUrl: string | null };
 type Service = { id: string; name: string; durationMinutes: number; priceInCents: number };
 
 type Product = { id: string; name: string; priceInCents: number; stock: number };
+type Client = { id: string; name: string; phone: string | null };
 
 interface Props {
   barbers: Barber[];
@@ -59,9 +59,10 @@ interface Props {
   initialAppointments: Appointment[];
   tenantId: string;
   products: Product[];
+  clients: Client[];
 }
 
-export function AgendaClient({ barbers, services, initialAppointments, tenantId, products }: Props) {
+export function AgendaClient({ barbers, services, initialAppointments, tenantId, products, clients }: Props) {
   const [mounted, setMounted] = useState(false);
   const [viewMode, setViewMode] = useState<'day' | 'week'>('day');
   const [currentDate, setCurrentDate] = useState<Date | null>(null);
@@ -338,6 +339,7 @@ export function AgendaClient({ barbers, services, initialAppointments, tenantId,
           modal={modal}
           barbers={barbers}
           services={services}
+          clients={clients}
           tenantId={tenantId}
           onClose={() => setModal(null)}
           onSuccess={() => { setModal(null); window.location.reload(); }}
@@ -483,10 +485,11 @@ function WeekColumn({ barbers, slots, slotHeight, appointments, isToday, nowY, c
 }
 
 /* ── Modal de Agendamento Manual ── */
-function AppointmentModal({ modal, barbers, services, tenantId, onClose, onSuccess }: {
+function AppointmentModal({ modal, barbers, services, clients, tenantId: _tenantId, onClose, onSuccess }: {
   modal: { barberId: string; date: Date; time: string };
   barbers: Barber[];
   services: Service[];
+  clients: Client[];
   tenantId: string;
   onClose: () => void;
   onSuccess: () => void;
@@ -498,23 +501,44 @@ function AppointmentModal({ modal, barbers, services, tenantId, onClose, onSucce
   const [time, setTime] = useState(isBlock ? '09:00' : modal.time);
   const [endTime, setEndTime] = useState('10:00');
   const [reason, setReason] = useState('');
-  const [customerName, setCustomerName] = useState('');
-  const [customerPhone, setCustomerPhone] = useState('');
-  const [phoneStep, setPhoneStep] = useState<'input' | 'found' | 'new'>('input');
-  const [isChecking, setIsChecking] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  async function checkPhone() {
-    if (customerPhone.length < 8) return;
-    setIsChecking(true);
-    const found = await checkCustomerByPhoneAction(customerPhone, tenantId);
-    if (found) {
-      setCustomerName(found.name);
-      setPhoneStep('found');
-    } else {
-      setPhoneStep('new');
+  // Cliente
+  const [nameQuery, setNameQuery] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Fecha dropdown ao clicar fora
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
     }
-    setIsChecking(false);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Filtra clientes em ordem alfabética
+  const filteredClients = nameQuery.length >= 1
+    ? clients
+        .filter(c => c.name.toLowerCase().includes(nameQuery.toLowerCase()))
+        .slice(0, 8)
+    : clients.slice(0, 8);
+
+  function selectClient(c: Client) {
+    setSelectedClient(c);
+    setNameQuery(c.name);
+    setCustomerPhone(c.phone ?? '');
+    setShowDropdown(false);
+  }
+
+  function clearClient() {
+    setSelectedClient(null);
+    setNameQuery('');
+    setCustomerPhone('');
   }
 
   async function handleSubmit() {
@@ -536,19 +560,19 @@ function AppointmentModal({ modal, barbers, services, tenantId, onClose, onSucce
           barberId,
           serviceId,
           scheduledAt,
-          customerName,
+          customerName: nameQuery.trim(),
           customerPhone,
         });
       }
       onSuccess();
-    } catch (e) {
+    } catch {
       setIsSubmitting(false);
     }
   }
 
   const canSubmit = isBlock
     ? barberId && date && time && endTime
-    : barberId && serviceId && date && time && customerName;
+    : barberId && serviceId && date && time && nameQuery.trim().length > 0;
 
   return createPortal(
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
@@ -640,44 +664,100 @@ function AppointmentModal({ modal, barbers, services, tenantId, onClose, onSucce
                 </select>
               </div>
 
-              {/* Cliente */}
-              <div>
-                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block mb-1.5">Telefone do Cliente</label>
-                <div className="flex gap-2">
+              {/* Cliente — busca por nome */}
+              <div ref={dropdownRef} className="relative">
+                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block mb-1.5">Cliente</label>
+
+                {selectedClient ? (
+                  /* Cliente selecionado */
+                  <div className="flex items-center gap-3 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
+                    <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-black text-sm flex-shrink-0">
+                      {selectedClient.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-emerald-300 truncate">{selectedClient.name}</p>
+                      {selectedClient.phone && <p className="text-xs text-zinc-500">{selectedClient.phone}</p>}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={clearClient}
+                      className="p-1 text-zinc-500 hover:text-zinc-300 transition-colors flex-shrink-0"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  /* Campo de busca */
+                  <>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-600 pointer-events-none" />
+                      <input
+                        type="text"
+                        value={nameQuery}
+                        onChange={e => { setNameQuery(e.target.value); setShowDropdown(true); }}
+                        onFocus={() => setShowDropdown(true)}
+                        placeholder="Pesquisar pelo nome..."
+                        className="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-9 pr-3 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500/40"
+                        autoComplete="off"
+                      />
+                    </div>
+
+                    {/* Dropdown */}
+                    {showDropdown && (
+                      <div className="absolute left-0 right-0 top-full mt-1 bg-[#111] border border-zinc-800 rounded-xl shadow-2xl z-50 overflow-hidden max-h-52 overflow-y-auto">
+                        {filteredClients.length === 0 ? (
+                          <div className="px-4 py-3 text-xs text-zinc-500">
+                            {nameQuery ? `Nenhum cliente encontrado. "${nameQuery}" será criado como novo.` : 'Sem clientes cadastrados.'}
+                          </div>
+                        ) : (
+                          <>
+                            {nameQuery === '' && (
+                              <div className="px-3 py-1.5 text-[10px] font-bold text-zinc-600 uppercase tracking-widest border-b border-zinc-800/60">
+                                Clientes — A a Z
+                              </div>
+                            )}
+                            {filteredClients.map(c => (
+                              <button
+                                key={c.id}
+                                type="button"
+                                onMouseDown={() => selectClient(c)}
+                                className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-zinc-800/60 transition-colors text-left"
+                              >
+                                <div className="w-7 h-7 rounded-full bg-zinc-800 flex items-center justify-center text-orange-400 font-black text-xs flex-shrink-0">
+                                  {c.name.charAt(0).toUpperCase()}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm text-zinc-200 font-medium truncate">{c.name}</p>
+                                  {c.phone && <p className="text-xs text-zinc-600">{c.phone}</p>}
+                                </div>
+                              </button>
+                            ))}
+                            {nameQuery && !filteredClients.some(c => c.name.toLowerCase() === nameQuery.toLowerCase()) && (
+                              <div className="px-3 py-2.5 border-t border-zinc-800/60">
+                                <p className="text-xs text-zinc-500">
+                                  Pressione <span className="text-zinc-300 font-bold">Agendar</span> para criar <span className="text-orange-400">"{nameQuery}"</span> como novo cliente.
+                                </p>
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+
+              {/* Telefone — opcional para novos clientes */}
+              {!selectedClient && (
+                <div>
+                  <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block mb-1.5">
+                    Telefone <span className="text-zinc-700 normal-case font-normal">(opcional)</span>
+                  </label>
                   <input
                     type="text"
                     value={customerPhone}
-                    onChange={e => { setCustomerPhone(e.target.value); setPhoneStep('input'); setCustomerName(''); }}
-                    placeholder="(92) 98170-8066"
-                    className="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500/40"
-                  />
-                  <button
-                    type="button"
-                    onClick={checkPhone}
-                    disabled={customerPhone.length < 8 || isChecking}
-                    className="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl text-xs font-bold text-zinc-300 disabled:opacity-40 transition-all"
-                  >
-                    {isChecking ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              {phoneStep === 'found' && (
-                <div className="flex items-center gap-2 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                  <span className="text-sm text-emerald-300 font-bold">{customerName}</span>
-                  <span className="text-xs text-zinc-500 ml-auto">cliente cadastrado</span>
-                </div>
-              )}
-
-              {(phoneStep === 'new' || phoneStep === 'input') && (
-                <div>
-                  <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block mb-1.5">Nome do Cliente</label>
-                  <input
-                    type="text"
-                    value={customerName}
-                    onChange={e => setCustomerName(e.target.value)}
-                    placeholder="Nome completo"
+                    onChange={e => setCustomerPhone(e.target.value)}
+                    placeholder="(92) 99999-9999"
                     className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-orange-500/40"
                   />
                 </div>
