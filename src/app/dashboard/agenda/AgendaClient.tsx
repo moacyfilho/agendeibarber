@@ -305,6 +305,7 @@ export function AgendaClient({ barbers, services, initialAppointments, tenantId,
                       nowY={isToday(currentDate) ? nowY : null}
                       onCellClick={(slot) => handleCellClick(barber.id, currentDate, slot)}
                       products={products}
+                      services={services}
                     />
                   );
                 })
@@ -322,6 +323,7 @@ export function AgendaClient({ barbers, services, initialAppointments, tenantId,
                       colors={BARBER_COLORS}
                       onCellClick={(slot) => handleCellClick(visibleBarbers[0]?.id || '', day, slot)}
                       products={products}
+                      services={services}
                     />
                   );
                 })
@@ -346,7 +348,7 @@ export function AgendaClient({ barbers, services, initialAppointments, tenantId,
 }
 
 /* ── Coluna dia/barbeiro ── */
-function BarberColumn({ color, slots, slotHeight, appointments, isToday: _isToday, nowY, onCellClick, products }: {
+function BarberColumn({ color, slots, slotHeight, appointments, isToday: _isToday, nowY, onCellClick, products, services }: {
   color: typeof BARBER_COLORS[0];
   slots: string[];
   slotHeight: number;
@@ -355,6 +357,7 @@ function BarberColumn({ color, slots, slotHeight, appointments, isToday: _isToda
   nowY: number | null;
   onCellClick: (slot: string) => void;
   products: Product[];
+  services: Service[];
 }) {
   return (
     <div className={`flex-1 min-w-0 border-r border-zinc-900 last:border-r-0 relative`}>
@@ -394,6 +397,7 @@ function BarberColumn({ color, slots, slotHeight, appointments, isToday: _isToda
             key={app.id}
             appointment={appForComanda}
             products={products}
+            services={services}
             trigger={
               <div
                 className={`absolute left-1 right-1 rounded-xl border ${color.card} px-2 py-1.5 z-10 cursor-pointer overflow-hidden transition-all hover:brightness-125`}
@@ -416,7 +420,7 @@ function BarberColumn({ color, slots, slotHeight, appointments, isToday: _isToda
 }
 
 /* ── Coluna semana ── */
-function WeekColumn({ barbers, slots, slotHeight, appointments, isToday, nowY, colors, onCellClick, products }: {
+function WeekColumn({ barbers, slots, slotHeight, appointments, isToday, nowY, colors, onCellClick, products, services }: {
   barbers: Barber[];
   slots: string[];
   slotHeight: number;
@@ -426,6 +430,7 @@ function WeekColumn({ barbers, slots, slotHeight, appointments, isToday, nowY, c
   colors: typeof BARBER_COLORS;
   onCellClick: (slot: string) => void;
   products: Product[];
+  services: Service[];
 }) {
   return (
     <div className={`flex-1 min-w-0 border-r border-zinc-900 last:border-r-0 relative ${isToday ? 'bg-orange-500/[0.02]' : ''}`}>
@@ -460,6 +465,7 @@ function WeekColumn({ barbers, slots, slotHeight, appointments, isToday, nowY, c
             key={app.id}
             appointment={appForComanda}
             products={products}
+            services={services}
             trigger={
               <div
                 className={`absolute left-0.5 right-0.5 rounded-lg border ${color.card} px-1.5 py-1 z-10 overflow-hidden cursor-pointer hover:brightness-125 transition-all`}
